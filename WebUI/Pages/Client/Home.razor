@@ -1,0 +1,94 @@
+﻿@page "/content/home"
+@using System.Security.Claims
+@using Domain.Models.Authentication
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<PageTitle>Home</PageTitle>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+@inject HttpClient Http
+@inject IClientService clientService
+
+<h3>Plates</h3>
+
+@if (plates == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Plate ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plate in plates)
+            {
+                <tr>
+                    <td>@plate.PlateId</td>
+                    <td>@plate.PlateName</td>
+                    <td>@plate.PlateBio</td>
+                    <td>$@plate.PlatePrice</td>
+                    <td>
+                        <button @onclick="() => AddPlateToCart(plate.PlateId)">
+                            Add to Cart
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string userId;
+    public IEnumerable<PlateDTO>? plates { get; set; }
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            plates = await plateService.GetAllPlates();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching plates: {ex.Message}");
+        }
+    }
+
+    private async Task AddPlateToCart(string plateId)
+    {
+        var authState = await AuthStateTask;
+
+        foreach (var claim in authState.User.Claims)
+        {
+            Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
+        }
+
+        var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;          
+            var response = await clientService.AddPlateToCart(plateId, userId);
+            await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
+        }
+        else
+        {
+            await js.InvokeVoidAsync("alert", "Something went wrong");
+        }
+        
+        // Assuming userId is fetched from a user service or stored in the component
+         // Replace with actual user ID retrieval logic
+
+        
+      
+    }
+}

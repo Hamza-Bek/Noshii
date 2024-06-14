@@ -1,0 +1,93 @@
+﻿@page "/account/identity/register"
+@using Application.DTOs.Request.Account
+@using Application.DTOs.Response.Account
+ @inject IJSRuntime js
+
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/css/register.css" rel="stylesheet" />
+
+@using Application.Extensions
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@UserRe" OnValidSubmit="HandleRegistration" class="container mt-5 form-container">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    @if(!isLoadingData)
+    {
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <InputSelect id="role" @bind-Value="UserRe.Role" class="form-control">
+                @foreach (var role in AvailableRoles ?? Enumerable.Empty<GetRoleDTO>())
+                {
+                    <option value="@role.Name">@role.Name</option>
+                }
+            </InputSelect>
+        </div>
+    }
+  
+
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <InputText id="name" @bind-Value="UserRe.Name" class="form-control" placeholder="Enter your name" />
+        <ValidationMessage For="@(() => UserRe.Name)" class="text-danger" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="UserRe.Email" class="form-control" placeholder="Enter your email" />
+        <ValidationMessage For="@(() => UserRe.Email)" class="text-danger" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" type="password" @bind-Value="UserRe.Password" class="form-control" placeholder="Enter your password" />
+        <ValidationMessage For="@(() => UserRe.Password)" class="text-danger" />
+    </div>
+
+    <div class="form-group">
+        <label for="confirmPassword">Confirm Password:</label>
+        <InputText id="confirmPassword" type="password" @bind-Value="UserRe.ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+        <ValidationMessage For="@(() => UserRe.ConfirmPassword)" class="text-danger" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">Register</button>
+</EditForm>
+
+
+@code{
+    public IEnumerable<GetRoleDTO>? AvailableRoles { get; set; }
+    public CreateAccountDTO UserRe { get; set; } = new();
+    bool isLoadingData = true;
+
+    protected async override Task OnInitializedAsync()
+    {
+        AvailableRoles = await accountService.GetRolesAsync();
+        isLoadingData = false;
+    }
+    
+    private async Task HandleRegistration()
+    {
+        var response = await accountService.CreateAccountAsync(UserRe);
+        if (response.Flag)
+        {
+            await js.InvokeVoidAsync("alert", response.Message);
+            
+            var responseLogin = await accountService.LoginAccountAsync(UserRe);
+            if (responseLogin.Flag)
+            {
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(new LocalStorageDTO()
+                    {
+                        Token = responseLogin.Token,
+                        Refresh = responseLogin.RefreshToken
+                    });
+                NavManager.NavigateTo("content/home", forceLoad: true);
+            }
+        }
+      
+        await js.InvokeVoidAsync("alert", response.Message);
+        return;
+
+    }
+}        

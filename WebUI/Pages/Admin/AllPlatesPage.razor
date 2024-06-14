@@ -1,0 +1,76 @@
+﻿@page "/admin/plates/"
+
+<PageTitle>Home</PageTitle>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+@inject HttpClient Http
+@inject IPlateService PlateService
+
+<h3>Plates</h3>
+
+@if (plates == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Plate ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plate in plates)
+            {
+                <tr>
+                    <td>@plate.PlateId</td>
+                    <td>@plate.PlateName</td>
+                    <td>@plate.PlateBio</td>
+                    <td>$@plate.PlatePrice</td>
+                    <td>
+                        <a @onclick="() => DeletePlate(plate.PlateId)">
+                            <i class="fas fa-trash text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public IEnumerable<PlateDTO>? plates { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            plates = await plateService.GetAllPlates();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching plates: {ex.Message}");
+        }
+    }
+
+    private async Task DeletePlate(string plateId)
+    {
+        try
+        {
+            var response = await plateService.RemovePlateAsync(plateId);
+            if (response.flag)
+            {
+                plates = plates.Where(p => p.PlateId != plateId).ToList();
+            }
+            await js.InvokeVoidAsync("alert", response.message);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting plate: {ex.Message}");
+        }
+    }
+}

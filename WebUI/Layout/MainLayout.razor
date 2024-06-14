@@ -1,0 +1,24 @@
+﻿@inherits LayoutComponentBase
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <AuthorizeView>
+                <Authorized>
+                    <a class=" btn btn-link text-danger text-decoration-none fw-bold" href="account/identity/logout">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a class=" btn btn-link text-primary text-decoration-none fw-bold" href="account/identity/login">Login</a>
+                    <a class=" btn btn-link text-primary text-decoration-none fw-bold" href="account/identity/register">Sign up</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>

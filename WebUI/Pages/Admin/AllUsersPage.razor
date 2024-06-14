@@ -1,0 +1,51 @@
+﻿@page "/admin/identity/users"
+@using Application.DTOs.Response.Account
+@using Domain.Models.Authentication
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>User List</h3>
+
+@if (users == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.RoleName</td>
+                    <td>@user.Email</td>
+                    <td>@user.Name</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<GetUsersWithRolesResponseDTO> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Call your backend service to retrieve the list of users
+            users = await accountService.GetUsersWithRolesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching users: {ex.Message}");
+        }
+    }
+}

@@ -1,0 +1,56 @@
+﻿@page "/account/identity/login"
+@using Application.DTOs.Request.Account
+@using Application.Extensions
+@using Application.Services
+@using NetcodeHub.Packages.Components.Validations.OnInput
+@using NetcodeHub.Packages.Components.Modal
+<link href="/css/login.css" rel="stylesheet" />
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="@User" OnValidSubmit="HandleLogin" class="container mt-5 form-container">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <InputText id="email" @bind-Value="User.Email" class="form-control" placeholder="Enter your email" />
+        <ValidationMessage For="@(() => User.Email)" class="text-danger" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" type="password" @bind-Value="User.Password" class="form-control" placeholder="Enter your password" />
+        <ValidationMessage For="@(() => User.Password)" class="text-danger" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">Login</button>
+</EditForm>
+
+
+
+@code {
+    public LoginDTO User { get; set; } = new();
+
+
+     async Task HandleLogin()
+    {
+
+        var response = await accountService.LoginAccountAsync(User);
+        if (response.Flag)
+        {
+
+
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(new LocalStorageDTO()
+                {
+                    Token = response.Token,
+                    Refresh = response.RefreshToken
+                });
+            NavManager.NavigateTo("content/home", forceLoad: true);
+        }
+
+        // await js.InvokeVoidAsync("alert", message);
+        return;
+    }
+}        

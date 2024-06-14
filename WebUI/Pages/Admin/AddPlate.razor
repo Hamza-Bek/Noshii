@@ -1,0 +1,52 @@
+﻿@page "/admin/plate/add"
+
+@attribute [Authorize(Roles = Constants.Role.Admin)]
+
+
+<PageTitle>PLate</PageTitle>
+
+<h1>Plate</h1>
+
+
+
+<h3>Add New Plate</h3>
+
+<EditForm Model="plate" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label for="plateName">Plate Name:</label>
+        <InputText id="plateName" @bind-Value="plate.PlateName" class="form-control" />
+    </div>
+    <div>
+        <label for="plateBio">Plate Bio:</label>
+        <InputText id="plateBio" @bind-Value="plate.PlateBio" class="form-control" />
+    </div>
+    <div>
+        <label for="platePrice">Plate Price:</label>
+        <InputNumber id="platePrice" @bind-Value="plate.PlatePrice" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+
+    public PlateDTO plate = new PlateDTO();
+
+     private async Task HandleValidSubmit()
+    {
+        var result = await plateService.AddPlateAsync(plate);
+        if(result.flag)
+        {
+            
+            await js.InvokeVoidAsync("alert", $"{plate.PlateName}Plate were added");
+        }
+        
+        else
+        {
+            Console.WriteLine($"Failed to add plate: {result.message}");
+        }
+    }
+}  

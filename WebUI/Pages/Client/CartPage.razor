@@ -1,0 +1,115 @@
+﻿@page "/client/cart/home"
+@using System.Security.Claims
+@using Domain.Models.Authentication
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject IClientService clienService
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<PageTitle>Home</PageTitle>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (userId == "Unknown")
+{
+    <p>User ID not found. Unable to load cart items.</p>
+}
+else if (!plates.Any())
+{
+    <p>No items in your cart.</p>
+}
+else
+{
+    <h3>Your Cart Items</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in plates)
+            {
+                <tr>
+                    <td>@item.PlateName</td>
+                    <td>$@item.PlatePrice</td>
+                    <td>@item.Quantity</td>
+                    <td>$@item.Total</td>
+                    <td>
+                        <a @onclick="() => DeletePlate(item.PlateId, userId)">
+                            <i class="fa-solid fa-minus text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"></td>
+                <th>Total:</th>
+                <td>$@plates.Sum(item => item.PlatePrice * item.Quantity)</td> <!-- Calculate total for all items -->
+            </tr>
+        </tfoot>
+    </table>
+}
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+    public string userId;
+    private bool isLoading = true;
+
+    private IEnumerable<CartItem> plates = new List<CartItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateTask;
+
+        foreach (var claim in authState.User.Claims)
+        {
+            Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
+        }
+
+        var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+        if (userIdClaim != null)
+        {
+            userId = userIdClaim.Value;
+            plates = await clienService.GetCartItems(userId);
+        }
+
+        isLoading = false;
+    }
+
+    
+
+    private async Task DeletePlate(string plateId , string userId)
+    {
+        var selectedPlate = await clienService.GetCartItems(userId);
+
+        try
+        {
+            var response = await clienService.RemovePlateFromCart(plateId, userId);
+            if (response.flag)
+            {
+                plates = plates.Where(p => p.PlateId != plateId).ToList(); 
+                NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+            }
+        
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting plate: {ex.Message}");
+        }
+    }
+
+    
+    
+}
