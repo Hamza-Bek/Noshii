@@ -130,8 +130,8 @@ namespace Infrastructure.Repositories
 
                 var cart = new Cart()
                 {                    
-                    Id = Guid.NewGuid().ToString(),
-                   UserId = user.Id
+                   Id = Guid.NewGuid().ToString(),
+                   UserId = user.Id                   
                 };
 
                 user.CartId = cart.Id;

@@ -79,6 +79,7 @@ else
             userId = userIdClaim.Value;          
             var response = await clientService.AddPlateToCart(plateId, userId);
             await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
+
         }
         else
         {

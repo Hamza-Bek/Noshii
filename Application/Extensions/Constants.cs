@@ -31,6 +31,10 @@ namespace Application.Extensions
         public const string AddPlateToCartRoute = "api/client/add/tocart";
         public const string GetAllPlateInCartRoute = "api/client/get/cart/plates/{userId}";
 
+
+        //ORDERD
+        public const string GetAllOrdersRoute = "api/orders/get/allorders";
+
         public const string AuthenticationType = "JwtAuth";
 
         public const string BrowserStorageKey = "x-key";

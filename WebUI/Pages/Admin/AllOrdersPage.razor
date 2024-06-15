@@ -1,0 +1,57 @@
+﻿@page "/admin/orders"
+@using Domain.Models.Order
+@inject IOrderService orderService
+
+<h3>Orders</h3>
+
+@if (orders == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order Id</th>
+                <th>User Id</th>
+                <th>Order Date</th>
+                <th>Order Price</th>
+                <th>Order Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.UserId</td>
+                    <td>@order.OrderDate</td>
+                    <td>$@order.OrderTotal</td>
+                    <td class="text-danger">@order.OrderStatus</td>
+                    <td>
+                        <a >
+                            <i class="fas fa-trash text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    }
+@code {
+    public IEnumerable<Order>? orders { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            orders = await orderService.GetAllOrders();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching plates: {ex.Message}");
+        }
+    }
+}

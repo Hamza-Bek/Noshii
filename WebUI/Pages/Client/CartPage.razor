@@ -3,6 +3,7 @@
 @using Domain.Models.Authentication
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @inject IClientService clienService
+@inject IOrderService orderService
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>Home</PageTitle>
@@ -60,13 +61,16 @@ else
             </tr>
         </tfoot>
     </table>
+
+    <button class="btn btn-primary" @onclick="PlaceOrder">Place Order</button>
 }
 
 @code {
     [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
-    public string userId;
+    private string userId;
+    private string cartId;
     private bool isLoading = true;
-
+    
     private IEnumerable<CartItem> plates = new List<CartItem>();
 
     protected override async Task OnInitializedAsync()
@@ -79,9 +83,11 @@ else
         }
 
         var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+        var userCartIdClaim = authState.User.FindFirst(c => c.Type == "CartId");
         if (userIdClaim != null)
         {
             userId = userIdClaim.Value;
+            cartId = userCartIdClaim.Value;
             plates = await clienService.GetCartItems(userId);
         }
 
@@ -110,6 +116,33 @@ else
         }
     }
 
-    
-    
+    private async Task PlaceOrder()
+    {
+        isLoading = true;
+
+        try
+        {
+            var response = await orderService.PlaceOrder(userId, cartId);
+            if (response.flag)
+            {
+                // Handle success (e.g., display a success message, redirect to another page, etc.)
+                
+                Console.WriteLine("Order placed successfully.");
+
+            }
+            else
+            {
+                // Handle failure (e.g., display an error message)
+                Console.WriteLine("Failed to place order.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            Console.WriteLine($"Error placing order: {ex.Message}");
+        }
+
+        isLoading = false;
+    }
+ 
 }

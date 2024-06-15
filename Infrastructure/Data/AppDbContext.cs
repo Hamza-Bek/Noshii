@@ -1,5 +1,6 @@
 ﻿using Domain.Models;
 using Domain.Models.Authentication;
+using Domain.Models.Order;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,8 @@ namespace Infrastructure.Data
         public DbSet<Plate> Plates { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderStatus> OrderStatuses { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)

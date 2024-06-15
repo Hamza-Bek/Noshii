@@ -1,0 +1,74 @@
+﻿@page "/client/order"
+@using System.Security.Claims
+@using Domain.Models.Order
+@inject IOrderService orderService
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (orders == null || !orders.Any())
+{
+    <p>No orders found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Order Date</th>
+                <th>Order Total</th>
+                <th>Order Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.OrderDate.ToShortDateString()</td>
+                    <td>@order.OrderTotal</td>
+                    <td class="text-danger" >@order.OrderStatus</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+    private string userId;
+    private IEnumerable<Order> orders;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthStateTask;
+
+            foreach (var claim in authState.User.Claims)
+            {
+                Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
+            }
+
+            var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+            var userCartIdClaim = authState.User.FindFirst(c => c.Type == "CartId");
+            if (userIdClaim != null)
+            {
+                userId = userIdClaim.Value;
+            }            
+
+            orders = await orderService.GetOrder(userId);
+            isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions (e.g., show error message)
+            Console.WriteLine($"Error fetching orders: {ex.Message}");
+        }
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Request.Order;
 using AutoMapper;
 using Domain.Models;
+using Domain.Models.Order;
 
 namespace Application.Extensions
 {
@@ -17,6 +18,9 @@ namespace Application.Extensions
             CreateMap<Plate, PlateDTO>();
             CreateMap<PlateDTO, Plate>();
 
+
+            CreateMap<OrderDTO, Order>();
+            CreateMap<Order, OrderDTO>();
         }
         
     }

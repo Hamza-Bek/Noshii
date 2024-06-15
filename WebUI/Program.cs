@@ -28,7 +28,7 @@ builder.Services.AddScoped<PlateService>();
 builder.Services.AddScoped<IPlateService, PlateService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IClientService, ClientService>();
-
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddHttpClient("WebUIClient", client =>
 {
@@ -45,7 +45,10 @@ builder.Services.AddHttpClient<IClientService, ClientService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
 });
-
+builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7173/");
+});
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 await builder.Build().RunAsync();

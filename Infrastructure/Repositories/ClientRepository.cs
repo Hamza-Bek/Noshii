@@ -41,6 +41,7 @@ namespace Infrastructure.Repositories
                 existingCartItem.Quantity += Quantity;
                 existingCartItem.Total = existingCartItem.Quantity * existingCartItem.PlatePrice;
 
+                getUserCart.CartTotal += (decimal)(Quantity * existingCartItem.PlatePrice); // Update only with the additional quantity
                 // Save the updated cart item
                 await SaveChangesAsync();
                 return new PlateResponse(flag: true, message: $"{plate.PlateName} quantity increased to {existingCartItem.Quantity}");
@@ -60,11 +61,15 @@ namespace Infrastructure.Repositories
                     Total = Quantity * plate.PlatePrice
                 };
 
-                await context.CartItems.AddAsync(c);
-                await SaveChangesAsync();
-                return new PlateResponse(flag: true, message: "The plate is here :)");
+                getUserCart.CartTotal += (decimal)c.Total;
+                
+            await context.CartItems.AddAsync(c);
+           
             }
-                 
+            //getUserCart.CartTotal += (decimal)(Quantity * plate.PlatePrice);
+            
+            await SaveChangesAsync();
+            return new PlateResponse(flag: true, message: "The plate is here :)");
         }     
 
         public async Task<PlateResponse> RemovePlateFromCartAsync(string plateId, string userId)
@@ -90,6 +95,7 @@ namespace Infrastructure.Repositories
             {
                 cartItemToRemove.Quantity --;
                 cartItemToRemove.Total = cartItemToRemove.Total - cartItemToRemove.PlatePrice;
+                getUserCart.CartTotal = (decimal)cartItemToRemove.Total;
                 await context.SaveChangesAsync();
             }
             else

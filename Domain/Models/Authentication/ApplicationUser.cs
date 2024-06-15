@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Domain.Models.Order;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Models.Authentication
 {
@@ -9,5 +10,6 @@ namespace Domain.Models.Authentication
 
         public string? CartId { get; set; }
         public Cart? Cart { get; set; }
+        //public Order? Order { get; set; }
     }
 }

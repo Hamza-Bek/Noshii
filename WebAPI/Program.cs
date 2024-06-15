@@ -84,6 +84,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IPlateRepository, PlateRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
 var app = builder.Build();
 
 
