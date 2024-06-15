@@ -3,6 +3,8 @@ using Application.DTOs.Response;
 using Application.Extensions;
 using Domain.Models.Order;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text;
 
 
 namespace Application.Services
@@ -76,6 +78,50 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<OrderResponse> ChangeOrderStatus(string orderId, string newStatusId)
+        {
+            var content = new StringContent(JsonSerializer.Serialize(new { newStatusId }), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"api/orders/change/status/{orderId}/{newStatusId}", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new OrderResponse(false, $"Error changing order status: {errorContent}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<OrderResponse>();
+            return result!;
+        }
+
+        public async Task<Dictionary<string, string>> GetAllStatusesDic()
+        {
+            var response = await _httpClient.GetAsync("api/orders/get/statuses/dic");
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                return data!;
+            }
+            throw new Exception();
+        }
+
+        public async Task<IEnumerable<OrderStatus>> GetAllStatuses()
+        {
+            try
+            {
+
+                var response = await _httpClient.GetAsync("api/orders/get/statuses");
+                string error = CheckResponseStatus(response);
+                if (!string.IsNullOrEmpty(error))
+                    throw new Exception(error);
+
+                var result = await response.Content.ReadFromJsonAsync<IEnumerable<OrderStatus>>();
+                return result!;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         private static string CheckResponseStatus(HttpResponseMessage response)
         {
@@ -85,6 +131,6 @@ namespace Application.Services
                 return null!;
         }
 
-     
+      
     }
 }

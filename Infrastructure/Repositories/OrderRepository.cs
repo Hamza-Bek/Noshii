@@ -12,6 +12,24 @@ namespace Infrastructure.Repositories
 {
     public class OrderRepository(AppDbContext context , IMapper mapper) : IOrderRepository
     {
+        public async Task<OrderResponse> ChangeOrderStatusAsync(string orderId,string newStatusId)
+        {
+            
+            var order = await context.Orders.FindAsync(orderId);
+            if (order == null)
+                return new OrderResponse(flag: false, message: "The order not found");
+
+            var status = await context.OrderStatuses.FindAsync(newStatusId);
+            if (status == null)
+                return new OrderResponse(flag: false, message: "The status not found");
+            order.OrderStatus = status.Status;
+
+            context.Orders.Update(order);
+
+            await SaveChangesAsync();
+            return new OrderResponse(true, "Status changed");
+        }
+
         public async Task<IEnumerable<Order>> GetAllOrders()=> await context.Orders.AsNoTracking().ToListAsync();
 
         public async Task<IEnumerable<Order>> GetOrder(string userId)
@@ -77,10 +95,13 @@ namespace Infrastructure.Repositories
             await SaveChangesAsync();            
             return new OrderResponse(flag: true, message: "Order placed");
         }
-      
 
+        public async Task<IEnumerable<OrderStatus>> GetStatusesAsync() => await context.OrderStatuses.AsNoTracking().ToListAsync();
 
+        public async Task<IEnumerable<OrderStatus>> GetAllStatusesAsync() => await context.OrderStatuses.AsNoTracking().ToListAsync();
         private async Task SaveChangesAsync() => await context.SaveChangesAsync();
+
+      
     }
   
 }

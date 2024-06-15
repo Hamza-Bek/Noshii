@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
+
 
 namespace Domain.Models
 {
@@ -12,6 +9,6 @@ namespace Domain.Models
         public string? PlateName { get; set; }
         public string? PlateBio { get; set; }
         public decimal? PlatePrice { get; set; }
-
+       // public IFormFile Image { get; set; }
     }
 }

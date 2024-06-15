@@ -9,6 +9,8 @@ namespace Application.Interfaces
     {
         Task<IEnumerable<Order>> GetOrder(string userId);
         Task<IEnumerable<Order>> GetAllOrders();
+        Task<IEnumerable<OrderStatus>> GetAllStatusesAsync();
+        Task<OrderResponse> ChangeOrderStatusAsync(string orderId, string newStatusId);
         Task<OrderResponse> PlaceOrderAsync(OrderDTO order , string userId, string cartId);
     }
 }

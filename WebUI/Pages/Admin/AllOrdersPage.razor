@@ -31,9 +31,14 @@ else
                     <td>$@order.OrderTotal</td>
                     <td class="text-danger">@order.OrderStatus</td>
                     <td>
-                        <a >
-                            <i class="fas fa-trash text-danger"></i>
-                        </a>
+                        <select @bind="@order.OrderStatus" class="checkboxes">
+                            @foreach (var kvp in Statuses)
+                            {
+                                <option value="@kvp.Key">@kvp.Value</option>
+
+                            }
+                        </select>
+                        <button class="btn btn-primary" @onclick="@(async () => await ChangeOrderStatusAsync(order.OrderId, order.OrderStatus))">Change Status</button>
                     </td>
                 </tr>
             }
@@ -42,16 +47,68 @@ else
     }
 @code {
     public IEnumerable<Order>? orders { get; set; }
+    public IEnumerable<OrderStatus>? orderStatuses { get; set; }
+    Dictionary<string, string> Statuses = new();
 
     protected override async Task OnInitializedAsync()
     {
+        await GetData();
         try
         {
             orders = await orderService.GetAllOrders();
+            orderStatuses = await orderService.GetAllStatuses();
+
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error fetching plates: {ex.Message}");
         }
     }
+
+
+    bool isLoadingData = true;
+    private async Task ChangeOrderStatusAsync(string orderId, string newStatusId)
+    {
+        try
+        {
+
+            
+            if (orderStatuses == null)
+            {
+                Console.WriteLine("Order statuses not loaded.");
+                return;
+            }
+
+
+
+            var selectedStatus = orderStatuses.FirstOrDefault(s => s.Id == newStatusId);
+            if (selectedStatus == null)
+            {
+                Console.WriteLine($"Status not found for Id: {newStatusId}");
+                return;
+            }
+            Console.WriteLine($"Status Id: {newStatusId}");
+
+            var response = await orderService.ChangeOrderStatus(orderId, newStatusId);
+            if (response.flag)
+            {
+                // Optionally reload the order details or update the UI state
+                orders = await orderService.GetAllOrders();
+                Console.WriteLine("Order status updated successfully!");
+            }
+            else
+            {
+                Console.WriteLine($"Error: {response.message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error changing order status: {ex.Message}");
+        }
+        finally
+        {
+            isLoadingData = false;
+        }
+    }
+    private async Task GetData() => Statuses = await orderService.GetAllStatusesDic();
 }

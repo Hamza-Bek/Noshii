@@ -13,6 +13,9 @@ namespace Application.Services
     {
         Task<IEnumerable<Order>> GetOrder(string userId);
         Task<IEnumerable<Order>> GetAllOrders();
+        Task<IEnumerable<OrderStatus>> GetAllStatuses();
+        Task<Dictionary<string, string>> GetAllStatusesDic();
+        Task<OrderResponse> ChangeOrderStatus(string orderId, string newStatusId);
         Task<OrderResponse> PlaceOrder( string userId, string cartId);
 
     }
