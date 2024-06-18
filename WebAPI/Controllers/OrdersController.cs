@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Request.Order;
+using Application.DTOs.Response;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Models;
@@ -76,6 +77,41 @@ namespace WebAPI.Controllers
         }
 
 
-     
+        [HttpDelete("clear-cart-total/{userId}")]
+        public async Task<ActionResult<OrderResponse>> ClearCartTotal(string userId)
+        {
+            try
+            {
+                var response = await _orderRepository.ClearCartTotal(userId);
+                if (!response.flag)
+                {
+                    return NotFound(response); // Return 404 Not Found if user or cart not found
+                }
+                return Ok(response); // Return 200 OK with response object if successful
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}"); // Return 500 Internal Server Error on unexpected errors
+            }
+        }
+
+        [HttpGet("get-cart-details/{userId}")]
+        public async Task<ActionResult<Cart>> GetCartDetails(string userId)
+        {
+            try
+            {
+                var cart = await _orderRepository.GetUserCart(userId);
+                if (cart == null)
+                {
+                    return NotFound(new { message = "No cart found for the user." });
+                }
+                return Ok(cart); // Return 200 OK with the cart details
+            }
+            catch (Exception ex)
+            {
+                // Return 500 Internal Server Error on unexpected errors
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

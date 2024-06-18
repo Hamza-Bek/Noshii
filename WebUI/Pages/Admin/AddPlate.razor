@@ -1,4 +1,7 @@
 ﻿@page "/admin/plate/add"
+@inject IFilesService FilesService
+@using Microsoft.AspNetCore.Http
+@using WebUI.Extensions
 
 @attribute [Authorize(Roles = Constants.Role.Admin)]
 
@@ -27,26 +30,85 @@
         <label for="platePrice">Plate Price:</label>
         <InputNumber id="platePrice" @bind-Value="plate.PlatePrice" class="form-control" />
     </div>
-
+    <div>
+        <InputFile OnChange="SelectPlateImage" multiple="false" />
+    </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
 
 @code {
-
+    private const int MaxAllowedFileSize = 1024 * 1024 * 10;
+    private string _errorMessage = string.Empty;
     public PlateDTO plate = new PlateDTO();
+    private List<IFormFile> _selectedImages = new();
+    private readonly IEnumerable<string> _allowedFileExtensions = [".jpeg", ".png", ".jpg", ".webp"];
 
-     private async Task HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
+        Console.WriteLine("We began submitting!");
+        plate.PlateId = Guid.NewGuid().ToString();
         var result = await plateService.AddPlateAsync(plate);
-        if(result.flag)
+
+        if (result.flag)
         {
-            
             await js.InvokeVoidAsync("alert", $"{plate.PlateName}Plate were added");
+
+            if (_selectedImages.Any())
+            {
+                foreach (var img in _selectedImages)
+                {
+                    Console.WriteLine("Uploading an image...");
+                    await FilesService.UploadImageAsync(img, plate.PlateId!);
+                }
+            }
+
+            NavManager.NavigateTo("/admin/plates/");
         }
-        
+
         else
         {
             Console.WriteLine($"Failed to add plate: {result.message}");
         }
+    }
+
+    private async Task SelectPlateImage(InputFileChangeEventArgs e)
+    {
+        // You can allow the user to select multiple images at once, if so,
+        // the e.FileCount property will be greater than 1, so you need a foreach loop
+        // to convert and add each selected image to the _selectedImages collection
+
+        // check for file size
+        if (e.File.Size > MaxAllowedFileSize)
+        {
+            _errorMessage = "Image size is greater than max allowed file size";
+            return;
+        }
+
+        // check for extension
+        var fileExtension = Path.GetExtension(e.File.Name);
+        if (!_allowedFileExtensions.Contains(fileExtension))
+        {
+            _errorMessage = $"Use of unacceptable file extension ({fileExtension})";
+            return;
+        }
+
+        try
+        {
+            var buffer = new byte[e.File.Size];
+            await e.File.OpenReadStream(MaxAllowedFileSize).ReadAsync(buffer);
+
+            // Convert to base64-encoded data URL
+            var base64String = Convert.ToBase64String(buffer);
+            var tempUrl = $"data:{e.File.ContentType};base64,{base64String}";
+
+            _selectedImages.Add(tempUrl.ToIFormFileFromBase64String());
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+
+        // check for multiple files
+        // TODO: Yours to implement if needed ;-)
     }
 }  

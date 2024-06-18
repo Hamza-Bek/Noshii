@@ -13,6 +13,7 @@ namespace Domain.Models
         public int? Quantity { get; set; }
 
         public Plate plate { get; set; }
+       // public Cart cart { get; set; }
         //public virtual Cart Cart { get; set; }
     }
 }

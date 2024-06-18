@@ -17,6 +17,7 @@ else
         <thead>
             <tr>
                 <th>Plate ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Price</th>
@@ -28,6 +29,7 @@ else
             {
                 <tr>
                     <td>@plate.PlateId</td>
+                   
                     <td>@plate.PlateName</td>
                     <td>@plate.PlateBio</td>
                     <td>$@plate.PlatePrice</td>
@@ -44,6 +46,7 @@ else
 
 @code {
     public IEnumerable<PlateDTO>? plates { get; set; }
+    private IBrowserFile? uploadedImage;    
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,7 +63,8 @@ else
     private async Task DeletePlate(string plateId)
     {
         try
-        {
+        {           
+
             var response = await plateService.RemovePlateAsync(plateId);
             if (response.flag)
             {

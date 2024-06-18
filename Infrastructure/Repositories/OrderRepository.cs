@@ -22,7 +22,11 @@ namespace Infrastructure.Repositories
             var status = await context.OrderStatuses.FindAsync(newStatusId);
             if (status == null)
                 return new OrderResponse(flag: false, message: "The status not found");
+
+      
+
             order.OrderStatus = status.Status;
+
 
             context.Orders.Update(order);
 
@@ -101,7 +105,33 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<OrderStatus>> GetAllStatusesAsync() => await context.OrderStatuses.AsNoTracking().ToListAsync();
         private async Task SaveChangesAsync() => await context.SaveChangesAsync();
 
-      
+        public async Task<OrderResponse> ClearCartTotal(string userId)
+        {
+            // Retrieve the user from the database
+            var getUser = await context.Users.FindAsync(userId);
+            if (getUser == null)
+                return new OrderResponse(flag: false, message: "No user was found");
+
+            // Retrieve the user's cart
+            var getUserCart = await context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (getUserCart == null)
+                return new OrderResponse(flag: false, message: "No user's cart was found");
+
+            // Clear the CartTotal
+            getUserCart.CartTotal = 0;
+
+            // Save the changes to the database
+            await context.SaveChangesAsync();
+
+            return new OrderResponse(flag: true, message: "Cart Total cleared successfully");
+        }
+
+        public async Task<Cart> GetUserCart(string userId)
+        {
+            return await context.Carts
+                            // Include related items if necessary
+                           .FirstOrDefaultAsync(c => c.UserId == userId);
+        }
     }
   
 }

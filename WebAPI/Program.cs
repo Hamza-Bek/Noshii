@@ -81,11 +81,13 @@ builder.Services.AddSwaggerGen(options =>
 
 #endregion
 
+#region Custom Service Registration
 builder.Services.AddScoped<IPlateRepository, PlateRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-
+builder.Services.AddScoped<IFilesRepository, FilesRepository>();
+#endregion
 var app = builder.Build();
 
 
@@ -107,6 +109,12 @@ if (app.Environment.IsDevelopment())
 app.UseCors("WebUI");
 
 app.UseHttpsRedirection();
+
+app.UseBlazorFrameworkFiles();
+
+app.UseStaticFiles();
+
+app.UseRouting();
 
 app.UseAuthentication();
 

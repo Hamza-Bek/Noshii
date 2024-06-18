@@ -16,7 +16,10 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddNetcodeHubLocalStorageService();
 builder.Services.AddScoped<Application.Extensions.LocalStorageService>();
 
-
+builder.Services.AddAuthorizationCore(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
 
 builder.Services.AddScoped<HttpClientService>();
 builder.Services.AddScoped<CustomHttpHandler>();
@@ -29,6 +32,7 @@ builder.Services.AddScoped<IPlateService, PlateService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IFilesService, FilesService>();
 
 builder.Services.AddHttpClient("WebUIClient", client =>
 {
@@ -46,6 +50,10 @@ builder.Services.AddHttpClient<IClientService, ClientService>(client =>
     client.BaseAddress = new Uri("https://localhost:7173/");
 });
 builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7173/");
+});
+builder.Services.AddHttpClient<IFilesService, FilesService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
 });

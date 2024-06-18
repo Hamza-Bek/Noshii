@@ -62,7 +62,9 @@ namespace Infrastructure.Repositories
                 };
 
                 getUserCart.CartTotal += (decimal)c.Total;
+
                 
+            
             await context.CartItems.AddAsync(c);
            
             }

@@ -24,7 +24,7 @@ namespace Infrastructure.Repositories
             if(check) return new PlateResponse(false, "Plate already exist!");
             var plate = new Plate()
             {
-                PlateId = Guid.NewGuid().ToString(),
+                PlateId = model.PlateId,
                 PlateName = model.PlateName,
                 PlateBio = model.PlateBio,
                 PlatePrice = model.PlatePrice
@@ -42,8 +42,11 @@ namespace Infrastructure.Repositories
             return new PlateResponse(true, "Plate Edited!");
         }
 
-        public async Task<IEnumerable<Plate>> GetAllPlates() => await _context.Plates.AsNoTracking().ToListAsync();
-
+        public async Task<IEnumerable<Plate>> GetAllPlates() => await _context
+             .Plates
+             .Include(p => p.Images)
+             .AsNoTracking()
+             .ToListAsync();
 
         public async Task<Plate> GetPlateById(string id) => await _context.Plates.FindAsync(id);
        

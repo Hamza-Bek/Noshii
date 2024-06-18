@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Request.Order;
 using Application.DTOs.Response;
+using Domain.Models;
 using Domain.Models.Order;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace Application.Services
     public interface IOrderService
     {
         Task<IEnumerable<Order>> GetOrder(string userId);
+        Task<OrderResponse> ClearCartTotal(string userId);
+        Task<Cart> GetUserCart(string userId);
         Task<IEnumerable<Order>> GetAllOrders();
         Task<IEnumerable<OrderStatus>> GetAllStatuses();
         Task<Dictionary<string, string>> GetAllStatusesDic();

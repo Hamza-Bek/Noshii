@@ -49,6 +49,8 @@ else
     public IEnumerable<Order>? orders { get; set; }
     public IEnumerable<OrderStatus>? orderStatuses { get; set; }
     Dictionary<string, string> Statuses = new();
+    private string AcceptStatusId = "95a16ed5-3da6-4502-ab24-92dc2ec0c777";
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,14 +74,34 @@ else
         try
         {
 
-            
+
             if (orderStatuses == null)
             {
                 Console.WriteLine("Order statuses not loaded.");
                 return;
             }
 
+            var order = orders?.FirstOrDefault(o => o.OrderId == orderId);
+            if (order == null)
+            {
+                Console.WriteLine($"Order not found for Id: {orderId}");
+                return;
+            }
 
+            if (order.OrderStatus == AcceptStatusId)
+            {
+                var clearCart = await orderService.ClearCartTotal(order.UserId);
+                if (clearCart.flag)
+                {
+                    // Optionally reload the order details or update the UI state
+                    orders = await orderService.GetAllOrders();
+                    Console.WriteLine("User cart total cleared!");
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {clearCart.message}");
+                }
+             }
 
             var selectedStatus = orderStatuses.FirstOrDefault(s => s.Id == newStatusId);
             if (selectedStatus == null)
@@ -90,6 +112,7 @@ else
             Console.WriteLine($"Status Id: {newStatusId}");
 
             var response = await orderService.ChangeOrderStatus(orderId, newStatusId);
+            
             if (response.flag)
             {
                 // Optionally reload the order details or update the UI state

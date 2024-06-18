@@ -1,74 +1,47 @@
-﻿@inject AuthenticationStateProvider AuthenticationStateProvider
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">WebUI</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+﻿@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="nav-wrapper">
+    <ul class="nav-links left">
+        <li><a href="/content/home">Home</a></li>
+    </ul>
+
+    <ul class="nav-links center">
+        <li ><a href="/client/cart/home">Cart</a></li>
+        <li class="upward"><a href="/client/order">Order</a></li>
+        <li class="forward"><a href="#">About</a></li>
+    </ul>
+
+    <ul class="nav-links right">
+        <AuthorizeView Policy="AdminOnly">
+            <Authorized>
+                <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn no-underline">Admin</a>
+                    <div class="dropdown-content">
+                        <a href="/admin/plate/add">Add Plate</a>
+                        <a href="/admin/plates/">Plate</a>
+                        <a href="/admin/orders">Orders</a>
+                        <a href="/admin/identity/users">Users</a>
+                    </div>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView>
+            <Authorized>
+                <li class="upward">
+                    <a class="text-danger" href="account/identity/logout">Logout</a>
+                </li>
+            </Authorized>
+            <NotAuthorized>
+                <li class="forward">
+                    <a href="account/identity/login">Login</a>
+                </li>
+                <li class="forward">
+                    <a href="account/identity/register">Sign up</a>
+                </li>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        
+    </ul>
 </div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/content/home" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/client/cart/home" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> My cart
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/client/order" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> My Orders
-            </NavLink>
-        </div>
-        @if (isAdmin)
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/admin/plate/add">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Add Plate
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/admin/plates/">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Plates
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/admin/identity/users">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Users
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/admin/orders" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span>  Orders
-                </NavLink>
-            </div>
-        }
-     
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private bool isAdmin;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        isAdmin = user.IsInRole("Admin");
-    }
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}

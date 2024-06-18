@@ -26,43 +26,49 @@ else if (!plates.Any())
 }
 else
 {
-    <h3>Your Cart Items</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Item Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="wrapper">
+		<h1>Shopping Cart</h1>
+		<div class="project">
+			<div class="shop">
             @foreach (var item in plates)
             {
-                <tr>
-                    <td>@item.PlateName</td>
-                    <td>$@item.PlatePrice</td>
-                    <td>@item.Quantity</td>
-                    <td>$@item.Total</td>
-                    <td>
-                        <a @onclick="() => DeletePlate(item.PlateId, userId)">
-                            <i class="fa-solid fa-minus text-danger"></i>
-                        </a>
-                    </td>
-                </tr>
+                <div class="box">
+                  
+                    <div class="content-cart">
+                        <div class="details-cart">
+                        <h3>@item.PlateName</h3>                        
+                        <div class="act">
+                        <h4>Price: $@item.PlatePrice</h4>
+                        
+                        <h4>Total : $@item.Total</h4>
+                        </div>
+                        </div>
+                        <div class="actions-cart">
+                        <p class="unit">Quantity:@item.Quantity </p>
+                                <a class="btn-area" @onclick="() => DeletePlate(item.PlateId, userId)">
+                                    <i aria-hidden="true" class="fa fa-trash"></i>
+                                    <span class="btn2">Remove</span>
+                                </a>
+                               
+                        </div>
+                    </div>
+                </div>
             }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3"></td>
-                <th>Total:</th>
-                <td>$@plates.Sum(item => item.PlatePrice * item.Quantity)</td> <!-- Calculate total for all items -->
-            </tr>
-        </tfoot>
-    </table>
 
-    <button class="btn btn-primary" @onclick="PlaceOrder">Place Order</button>
+            </div>
+            <div class="right-bar">
+                <p><span>Subtotal</span> <span>$120</span></p>
+                <hr>
+                <p><span>Tax (5%)</span> <span>$6</span></p>
+                <hr>
+                <p><span>Shipping</span> <span>$15</span></p>
+                <hr>
+                <p><span>Total</span> <span>$@plates.Sum(item => item.PlatePrice * item.Quantity)</span></p>
+                <button class="btn btn-primary" @onclick="PlaceOrder">Place Order</button>
+            </div>
+        </div>
+    </div>
+    
 }
 
 @code {
@@ -70,7 +76,8 @@ else
     private string userId;
     private string cartId;
     private bool isLoading = true;
-    
+   
+
     private IEnumerable<CartItem> plates = new List<CartItem>();
 
     protected override async Task OnInitializedAsync()
@@ -89,8 +96,9 @@ else
             userId = userIdClaim.Value;
             cartId = userCartIdClaim.Value;
             plates = await clienService.GetCartItems(userId);
-        }
-
+          
+        }     
+        
         isLoading = false;
     }
 

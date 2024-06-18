@@ -1,6 +1,7 @@
 ﻿
 using Application.DTOs.Request.Order;
 using Application.DTOs.Response;
+using Domain.Models;
 using Domain.Models.Order;
 
 namespace Application.Interfaces
@@ -8,6 +9,8 @@ namespace Application.Interfaces
     public interface IOrderRepository
     {
         Task<IEnumerable<Order>> GetOrder(string userId);
+        Task<OrderResponse> ClearCartTotal(string userId);
+        Task<Cart> GetUserCart(string userId);
         Task<IEnumerable<Order>> GetAllOrders();
         Task<IEnumerable<OrderStatus>> GetAllStatusesAsync();
         Task<OrderResponse> ChangeOrderStatusAsync(string orderId, string newStatusId);

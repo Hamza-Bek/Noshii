@@ -10,7 +10,32 @@
 @inject HttpClient Http
 @inject IClientService clientService
 
-<h3>Plates</h3>
+<style>
+   
+
+    .full-background {
+        background-image: url(/imgs/PlatesBG.jpg); /* Replace with your image path */
+        background-size: cover;
+        background-position: center;
+        height: 50vh;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 15rem 5vw 4rem;
+        padding-top: 0;
+        list-style-type: none;
+    }
+</style>
+
+<div class="full-background"></div>
 
 @if (plates == null)
 {
@@ -18,35 +43,34 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Plate ID</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <ul class="cards">
             @foreach (var plate in plates)
-            {
-                <tr>
-                    <td>@plate.PlateId</td>
-                    <td>@plate.PlateName</td>
-                    <td>@plate.PlateBio</td>
-                    <td>$@plate.PlatePrice</td>
-                    <td>
-                        <button @onclick="() => AddPlateToCart(plate.PlateId)">
-                            Add to Cart
-                        </button>
-                    </td>
-                </tr>
+            {                        
+                <li>                    
+                    <a class="card">
+                    <img src="@plate.CoverImageUrl" class="card__image" alt="" />
+                        <div class="card__overlay">
+                            <div class="card__header">
+                                <svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>
+                               
+                                <div class="card__header-text">
+                                    <h3 class="card__title">@plate.PlateName</h3>
+                                    <span class="card__status">$@plate.PlatePrice</span>
+                                </div>
+                                <button @onclick="() => AddPlateToCart(plate.PlateId)" class="card__add-to-cart">
+                                    Add to Cart
+                                </button>
+                            </div>
+                            <p class="card__description">@plate.PlateBio</p>
+                        </div>
+                    </a>
+                </li>                                
             }
-        </tbody>
-    </table>
-}
+        </ul>
 
+        }
+
+     
 @code {
     private string userId;
     public IEnumerable<PlateDTO>? plates { get; set; }
@@ -76,7 +100,7 @@ else
         var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
         if (userIdClaim != null)
         {
-            userId = userIdClaim.Value;          
+            userId = userIdClaim.Value;
             var response = await clientService.AddPlateToCart(plateId, userId);
             await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
 
@@ -85,11 +109,11 @@ else
         {
             await js.InvokeVoidAsync("alert", "Something went wrong");
         }
-        
-        // Assuming userId is fetched from a user service or stored in the component
-         // Replace with actual user ID retrieval logic
 
-        
-      
+        // Assuming userId is fetched from a user service or stored in the component
+        // Replace with actual user ID retrieval logic
+
+
+
     }
 }

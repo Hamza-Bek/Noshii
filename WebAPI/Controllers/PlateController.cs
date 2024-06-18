@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Request.Order;
+using Application.Extensions;
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
@@ -25,8 +26,12 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetPlates()
         {
             var data = await _plateRepository.GetAllPlates();
-            return Ok(data);
+
+            // Manual mapping
+            var mappedPlates = data.Select(p => p.ToPlateDto());
+            return Ok(mappedPlates);
         }
+
         [HttpGet("get-id/plate")]
         [ProducesResponseType(200, Type = typeof(Plate))] //MAKE THE END POINT A MORE CLEANER
         [ProducesResponseType(400)]

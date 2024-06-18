@@ -5,6 +5,7 @@ using Domain.Models.Order;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text;
+using Domain.Models;
 
 
 namespace Application.Services
@@ -122,7 +123,37 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<OrderResponse> ClearCartTotal(string userId)
+        {
+            var response = await _httpClient.DeleteAsync($"api/orders/clear-cart-total/{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return new OrderResponse { flag = true, message = "Item deleted successfully." };
+            }
+            else
+            {
+                return new OrderResponse { flag = false, message = "Failed to remove the plate!" };
+            }
+        }
 
+        public async Task<Cart> GetUserCart(string userId)
+        {
+            try
+            {
+
+                var response = await _httpClient.GetAsync($"api/orders/get-cart-details/{userId}");
+                string error = CheckResponseStatus(response);
+                if (!string.IsNullOrEmpty(error))
+                    throw new Exception(error);
+
+                var result = await response.Content.ReadFromJsonAsync<Cart>();
+                return result!;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         private static string CheckResponseStatus(HttpResponseMessage response)
         {
             if (!response.IsSuccessStatusCode)
