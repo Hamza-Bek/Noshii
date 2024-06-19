@@ -88,8 +88,10 @@ namespace Infrastructure.Repositories
                 OrderDate = order.OrderDate,
                 OrderTotal = orderTotal,
                 OrderStatus = order.OrderStatus
-            };      
+            };
 
+
+            
             context.Orders.Add(o);
             // Remove cart items from the database
             context.CartItems.RemoveRange(getUserCart.CartItems);

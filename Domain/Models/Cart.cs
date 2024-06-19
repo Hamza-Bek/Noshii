@@ -12,6 +12,6 @@ namespace Domain.Models
 
         public ICollection<CartItem>? CartItems { get; set; } = new List<CartItem>();
 
-        public decimal? FinalTotalPrice => CartItems is not null ? CartItems.Sum(i => i.PlatePrice * i.Quantity) : 0;
+        
     }
 }

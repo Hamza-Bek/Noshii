@@ -3,6 +3,7 @@ using Application.DTOs.Response;
 using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -62,10 +63,10 @@ namespace Infrastructure.Repositories
                 };
 
                 getUserCart.CartTotal += (decimal)c.Total;
+               
 
-                
-            
-            await context.CartItems.AddAsync(c);
+
+                await context.CartItems.AddAsync(c);
            
             }
             //getUserCart.CartTotal += (decimal)(Quantity * plate.PlatePrice);
