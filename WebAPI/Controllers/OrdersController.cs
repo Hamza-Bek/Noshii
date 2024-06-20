@@ -14,7 +14,7 @@ namespace WebAPI.Controllers
 {
     [Route("/api/[controller]")]
     [ApiController]
-    public class OrdersController(IOrderRepository _orderRepository , AppDbContext context) : Controller
+    public class OrdersController(IOrderRepository _orderRepository, AppDbContext context) : Controller
     {
 
         [HttpPost("order/place/{userId}/{cartId}")]
@@ -66,7 +66,7 @@ namespace WebAPI.Controllers
 
 
         }
-        
+
         [HttpGet("get/statuses")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<OrderStatus>))]
         public async Task<IActionResult> GetAllStatuses()
@@ -113,5 +113,58 @@ namespace WebAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpPut("change/is-order/{userid}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ChangeIsOrder(string userId)
+        {
+
+            var data = await _orderRepository.ChangeIsOrderBool(userId);
+            return Ok(data);
+        }
+        [HttpPut("update/user/cart/{userId}")]
+        public async Task<IActionResult> UpdateIsOrdered(string userId)
+        {
+            try
+            {
+                var getUserCart = await _orderRepository.GetUserCart(userId);
+
+                if (getUserCart == null)
+                {
+                    return NotFound("User cart not found.");
+                }
+
+                // Setting IsOrdered to false
+                getUserCart.IsOrdered = false;
+
+                // Save the updated cart back to the database
+                var updateResult = await _orderRepository.UpdateUserCartAsync(getUserCart);
+
+                if (updateResult)
+                {
+                    return Ok(new { Message = "User cart updated successfully!", UserCart = getUserCart });
+                }
+                else
+                {
+                    return StatusCode(500, "Failed to save the updated UserCart.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Exception occurred: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("clear/cart{userId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> RemovePlate(string userId)
+        {
+            var result = await _orderRepository.ClearCartItems(userId);
+            return Ok(result);
+        }
+
     }
 }

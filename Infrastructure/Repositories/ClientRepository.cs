@@ -34,7 +34,7 @@ namespace Infrastructure.Repositories
 
 
             var existingCartItem = await context.CartItems
-                .FirstOrDefaultAsync(ci => ci.PlateId == plate.PlateId && ci.CartId == getUser.CartId);
+                .FirstOrDefaultAsync(ci => ci.PlateId == plate.Id && ci.CartId == getUser.CartId);
 
             if (existingCartItem != null)
             {
@@ -55,7 +55,7 @@ namespace Infrastructure.Repositories
                 {
                     Id = Guid.NewGuid().ToString(),
                     CartId = getUser.CartId,
-                    PlateId = plate.PlateId,
+                    PlateId = plate.Id,
                     PlateName = plate.PlateName,
                     PlatePrice = plate.PlatePrice,
                     Quantity = Quantity,
@@ -89,7 +89,7 @@ namespace Infrastructure.Repositories
                 return new PlateResponse(flag: false, message: "The user's cart is not found!");
 
             var cartItemToRemove = await context.CartItems
-                .FirstOrDefaultAsync(ci => ci.PlateId == plate.PlateId && ci.CartId == getUser.CartId);
+                .FirstOrDefaultAsync(ci => ci.PlateId == plate.Id && ci.CartId == getUser.CartId);
            
             if (cartItemToRemove == null)
                 return new PlateResponse(flag: false, message: "The plate is not in the cart!");

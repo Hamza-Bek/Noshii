@@ -21,9 +21,7 @@ namespace Infrastructure.Repositories
 
             var status = await context.OrderStatuses.FindAsync(newStatusId);
             if (status == null)
-                return new OrderResponse(flag: false, message: "The status not found");
-
-      
+                return new OrderResponse(flag: false, message: "The status not found");          
 
             order.OrderStatus = status.Status;
 
@@ -45,18 +43,23 @@ namespace Infrastructure.Repositories
                 return Enumerable.Empty<Order>();
             }
 
+            var getUserOrders = await context.Orders
+       .Where(o => o.UserId == getUser.Id)
+       .Include(o => o.OrderMaker) // Eager load OrderMaker
+       .Include(o => o.CartItems) // Eager load CartItems
+           .ThenInclude(ci => ci.Plate) // Eager load Plate for each CartItem
+       .ToListAsync();
 
-            var getUserOrder = await context.Orders
-             .Where(ci => ci.UserId == getUser.Id)
-             .ToListAsync();
-
-            if (getUserOrder == null || !getUserOrder.Any())
+            if (getUserOrders == null || !getUserOrders.Any())
             {
                 Console.WriteLine("User's cart not found");
                 return Enumerable.Empty<Order>();
             }
 
-            return (IEnumerable<Order>)getUserOrder;
+            return getUserOrders
+          .GroupBy(o => o.OrderId)
+          .Select(g => g.First())
+          .ToList();
         }
 
         public async Task<OrderResponse> PlaceOrderAsync(OrderDTO order , string userId ,string cartId)
@@ -90,7 +93,7 @@ namespace Infrastructure.Repositories
                 OrderStatus = order.OrderStatus
             };
 
-
+            getUserCart.IsOrdered = true;
             
             context.Orders.Add(o);
             // Remove cart items from the database
@@ -129,10 +132,57 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<Cart> GetUserCart(string userId)
-        {
+        {            
             return await context.Carts
-                            // Include related items if necessary
-                           .FirstOrDefaultAsync(c => c.UserId == userId);
+                            .Include(p => p.CartOwner)
+                            .Include(u => u.CartItems)// Include related items if necessary
+                           .FirstOrDefaultAsync(c => c.UserId == userId);           
+        }
+
+        public async Task<OrderResponse> ChangeIsOrderBool(string userId)
+        {
+            var getUser = await context.Users.FindAsync(userId);
+            if (getUser == null) return new OrderResponse(flag:false , message:"The user was not found") ;
+
+            var getUserCart = await context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (getUserCart == null)
+                return new OrderResponse(flag: false, message: "No user's cart was found");
+
+            getUserCart.IsOrdered = true;
+
+            await SaveChangesAsync();
+            return new OrderResponse(flag: true, message: "The column IsOrdered changed successfully");
+        }
+
+        public async Task<bool> UpdateUserCartAsync(Cart userCart)
+        {
+            context.Carts.Update(userCart);
+            return await context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<OrderResponse> ClearCartItems(string userId)
+        {
+            var getUser = await context.Users.FindAsync(userId);
+            if (getUser == null)
+                return new OrderResponse(flag: false, message: "The user was not found");
+
+            var getUserCart = await context.Carts.Include(p => p.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
+            if (getUserCart == null)
+                return new OrderResponse(flag: false, message: "The user's cart is not found!");
+
+            // Get all cart items for the user
+            var getUserCartItems = context.CartItems.Where(ci => ci.CartId == getUserCart.Id).ToList();
+            if (!getUserCartItems.Any())
+                return new OrderResponse(flag: false, message: "Cart is already clear");
+
+            // Remove each cart item from the context
+            context.CartItems.RemoveRange(getUserCartItems);
+
+            // Save changes to the database
+            await context.SaveChangesAsync();
+
+
+            return new OrderResponse(flag:true  , message:"The cart cleared!");
         }
     }
   

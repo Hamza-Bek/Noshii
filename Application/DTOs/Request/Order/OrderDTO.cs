@@ -12,5 +12,6 @@ namespace Application.DTOs.Request.Order
         public DateTime OrderDate { get; set; }
         public decimal OrderTotal { get; set; }
         public string? OrderStatus { get; set; }
+        public bool? IsOrdered { get; set; }
     }
 }

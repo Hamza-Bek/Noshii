@@ -9,7 +9,9 @@ namespace Domain.Models.Authentication
         public string? Address { get; set; }
 
         public string? CartId { get; set; }
-        public Cart? Cart { get; set; }
-        //public Order? Order { get; set; }
+                
+        public Cart Cart { get; set; }
+        
+        public ICollection<Domain.Models.Order.Order> Orders { get; set; } = new List<Domain.Models.Order.Order>();
     }
 }

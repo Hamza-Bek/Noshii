@@ -76,7 +76,7 @@ else
     private string userId;
     private string cartId;
     private bool isLoading = true;
-   
+
 
     private IEnumerable<CartItem> plates = new List<CartItem>();
 
@@ -96,13 +96,13 @@ else
             userId = userIdClaim.Value;
             cartId = userCartIdClaim.Value;
             plates = await clienService.GetCartItems(userId);
-          
+
         }     
-        
+
         isLoading = false;
     }
 
-    
+
 
     private async Task DeletePlate(string plateId , string userId)
     {
@@ -116,7 +116,7 @@ else
                 plates = plates.Where(p => p.PlateId != plateId).ToList(); 
                 NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
             }
-        
+
         }
         catch (Exception ex)
         {
@@ -134,7 +134,8 @@ else
             if (response.flag)
             {
                 // Handle success (e.g., display a success message, redirect to another page, etc.)
-                
+                await orderService.ClearCartItems(userId);
+                NavManager.NavigateTo("/client/order");
                 Console.WriteLine("Order placed successfully.");
 
             }

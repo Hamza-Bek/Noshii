@@ -8,9 +8,13 @@ namespace Application.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<IEnumerable<Order>> GetOrder(string userId);
-        Task<OrderResponse> ClearCartTotal(string userId);
         Task<Cart> GetUserCart(string userId);
+        Task<OrderResponse> ClearCartTotal(string userId);
+        Task<OrderResponse> ClearCartItems(string userId);
+        Task<OrderResponse> ChangeIsOrderBool(string userId);
+        Task<bool> UpdateUserCartAsync(Cart userCart);
+
+        Task<IEnumerable<Order>> GetOrder(string userId);               
         Task<IEnumerable<Order>> GetAllOrders();
         Task<IEnumerable<OrderStatus>> GetAllStatusesAsync();
         Task<OrderResponse> ChangeOrderStatusAsync(string orderId, string newStatusId);

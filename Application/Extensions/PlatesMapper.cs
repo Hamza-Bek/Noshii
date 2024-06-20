@@ -9,7 +9,7 @@ public static class PlatesMapper
     {
         return new()
         {
-            PlateId = plate.PlateId,
+            Id = plate.Id,
             PlateName = plate.PlateName,
             PlatePrice = plate.PlatePrice,
             PlateBio = plate.PlateBio,

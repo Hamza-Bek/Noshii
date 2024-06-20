@@ -46,7 +46,7 @@
     private async Task HandleValidSubmit()
     {
         Console.WriteLine("We began submitting!");
-        plate.PlateId = Guid.NewGuid().ToString();
+        plate.Id = Guid.NewGuid().ToString();
         var result = await plateService.AddPlateAsync(plate);
 
         if (result.flag)
@@ -58,7 +58,7 @@
                 foreach (var img in _selectedImages)
                 {
                     Console.WriteLine("Uploading an image...");
-                    await FilesService.UploadImageAsync(img, plate.PlateId!);
+                    await FilesService.UploadImageAsync(img, plate.Id!);
                 }
             }
 

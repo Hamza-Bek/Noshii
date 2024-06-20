@@ -9,7 +9,7 @@ namespace Application.DTOs.Request.Order
 {
     public class PlateDTO
     {
-        public string? PlateId { get; set; }
+        public string Id { get; set; }
         public string? PlateName { get; set; }
         public string? PlateBio { get; set; }
         public decimal? PlatePrice { get; set; }

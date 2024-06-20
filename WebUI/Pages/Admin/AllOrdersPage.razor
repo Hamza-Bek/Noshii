@@ -90,18 +90,35 @@ else
 
             if (order.OrderStatus == AcceptStatusId)
             {
-                var clearCart = await orderService.ClearCartTotal(order.UserId);
-                if (clearCart.flag)
+                try
                 {
-                    // Optionally reload the order details or update the UI state
-                    orders = await orderService.GetAllOrders();
-                    Console.WriteLine("User cart total cleared!");
+                    var user = order.UserId;
+                    var clearCart = await orderService.ClearCartTotal(order.UserId);
+                    var getUserCart = await orderService.GetUserCart(user);
+                    if (getUserCart != null)
+                    {
+                        
+                        await orderService.UpdateUserCartAsync(user);
+                        Console.WriteLine($"User Isorder changed! {getUserCart.IsOrdered}");
+                        
+                    }
+                    if (clearCart.flag )
+                    {
+                        
+                        // Optionally reload the order details or update the UI state
+                        orders = await orderService.GetAllOrders();
+                        Console.WriteLine("User cart total cleared!");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {clearCart.message}");
+                    }
                 }
-                else
+                catch
                 {
-                    Console.WriteLine($"Error: {clearCart.message}");
+                    
                 }
-             }
+            }
 
             var selectedStatus = orderStatuses.FirstOrDefault(s => s.Id == newStatusId);
             if (selectedStatus == null)

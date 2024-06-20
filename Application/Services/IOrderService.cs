@@ -14,6 +14,9 @@ namespace Application.Services
     {
         Task<IEnumerable<Order>> GetOrder(string userId);
         Task<OrderResponse> ClearCartTotal(string userId);
+        Task<OrderResponse> ClearCartItems(string userId);
+        Task<OrderResponse> ChangeIsOrderBool(string userId);
+        Task<bool> UpdateUserCartAsync(string userId);
         Task<Cart> GetUserCart(string userId);
         Task<IEnumerable<Order>> GetAllOrders();
         Task<IEnumerable<OrderStatus>> GetAllStatuses();

@@ -1,4 +1,5 @@
-﻿using Domain.Models.Authentication;
+﻿using Domain.Models;
+using Domain.Models.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,6 @@ namespace Application.DTOs.Request.Order
     {
         public string? Id { get; set; }
         public string? UserId { get; set; }
-        public ApplicationUser CartOwner { get; set; }
+ 
     }
 }

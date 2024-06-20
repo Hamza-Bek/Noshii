@@ -28,13 +28,13 @@ else
             @foreach (var plate in plates)
             {
                 <tr>
-                    <td>@plate.PlateId</td>
+                    <td>@plate.Id</td>
                    
                     <td>@plate.PlateName</td>
                     <td>@plate.PlateBio</td>
                     <td>$@plate.PlatePrice</td>
                     <td>
-                        <a @onclick="() => DeletePlate(plate.PlateId)">
+                        <a @onclick="() => DeletePlate(plate.Id)">
                             <i class="fas fa-trash text-danger"></i>
                         </a>
                     </td>
@@ -68,7 +68,7 @@ else
             var response = await plateService.RemovePlateAsync(plateId);
             if (response.flag)
             {
-                plates = plates.Where(p => p.PlateId != plateId).ToList();
+                plates = plates.Where(p => p.Id != plateId).ToList();
             }
             await js.InvokeVoidAsync("alert", response.message);
         }

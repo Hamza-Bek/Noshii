@@ -26,15 +26,12 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<ApplicationUser>() // One to one relationship
-              .HasOne(p => p.Cart)
-              .WithOne(p => p.CartOwner)
-              .OnDelete(DeleteBehavior.NoAction);
-            // .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<ApplicationUser>()
+            .HasOne(a => a.Cart)
+            .WithOne(c => c.CartOwner)
+            .HasForeignKey<Cart>(c => c.UserId)
+          .OnDelete(DeleteBehavior.NoAction);
 
-            builder.Entity<Cart>() // Many to many relationship
-             .HasMany(p => p.CartItems)
-             .WithMany();
         }
     }
 }

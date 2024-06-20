@@ -6,11 +6,12 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text;
 using Domain.Models;
+using Application.Interfaces;
 
 
 namespace Application.Services
 {
-    public class OrderService (HttpClient _httpClient): IOrderService
+    public class OrderService (HttpClient _httpClient ): IOrderService
     {
         public async Task<IEnumerable<Order>> GetAllOrders()
         {
@@ -162,6 +163,43 @@ namespace Application.Services
                 return null!;
         }
 
-      
+        public async Task<OrderResponse> ChangeIsOrderBool(string userId)
+        {
+            var content = new StringContent(JsonSerializer.Serialize(new { userId }), Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return new OrderResponse(false, $"Error changing order status: {errorContent}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<OrderResponse>();
+            return result!;
+        }
+        public async Task<bool> UpdateUserCartAsync(string userId)
+        {
+            var response = await _httpClient.PutAsync($"api/orders/update/user/cart/{userId}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<OrderResponse> ClearCartItems(string userId)
+        {
+            var response = await _httpClient.DeleteAsync($"api/orders/clear/cart{userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return new OrderResponse { flag = true, message = "Item deleted successfully." };
+            }
+            else
+            {
+                return new OrderResponse { flag = false, message = "Failed to remove the plate!" };
+            }
+        }
     }
 }

@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240619045529_AddIsOrderedToCart")]
+    partial class AddIsOrderedToCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,21 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CartCartItem", b =>
+                {
+                    b.Property<string>("CartId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CartItemsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CartId", "CartItemsId");
+
+                    b.HasIndex("CartItemsId");
+
+                    b.ToTable("CartCartItem");
+                });
 
             modelBuilder.Entity("Domain.Models.Authentication.ApplicationUser", b =>
                 {
@@ -34,7 +52,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CartId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -85,6 +103,10 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CartId")
+                        .IsUnique()
+                        .HasFilter("[CartId] IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -127,13 +149,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Carts");
                 });
@@ -144,10 +162,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CartId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("OrderId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlateId")
                         .HasColumnType("nvarchar(450)");
@@ -165,10 +180,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("PlateId");
 
@@ -206,9 +217,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OrderMakerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("OrderStatus")
                         .HasColumnType("nvarchar(max)");
 
@@ -220,8 +228,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("OrderMakerId");
 
                     b.ToTable("Orders");
                 });
@@ -242,7 +248,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Plate", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("PlateId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PlateBio")
@@ -254,7 +260,7 @@ namespace Infrastructure.Migrations
                     b.Property<decimal?>("PlatePrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("PlateId");
 
                     b.ToTable("Plates");
                 });
@@ -392,33 +398,38 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Models.Cart", b =>
+            modelBuilder.Entity("CartCartItem", b =>
                 {
-                    b.HasOne("Domain.Models.Authentication.ApplicationUser", "CartOwner")
-                        .WithOne("Cart")
-                        .HasForeignKey("Domain.Models.Cart", "UserId")
+                    b.HasOne("Domain.Models.Cart", null)
+                        .WithMany()
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Models.CartItem", null)
+                        .WithMany()
+                        .HasForeignKey("CartItemsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Models.Authentication.ApplicationUser", b =>
+                {
+                    b.HasOne("Domain.Models.Cart", "Cart")
+                        .WithOne("CartOwner")
+                        .HasForeignKey("Domain.Models.Authentication.ApplicationUser", "CartId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("CartOwner");
+                    b.Navigation("Cart");
                 });
 
             modelBuilder.Entity("Domain.Models.CartItem", b =>
                 {
-                    b.HasOne("Domain.Models.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId");
-
-                    b.HasOne("Domain.Models.Order.Order", null)
-                        .WithMany("CartItems")
-                        .HasForeignKey("OrderId");
-
-                    b.HasOne("Domain.Models.Plate", "Plate")
-                        .WithMany("CartItems")
+                    b.HasOne("Domain.Models.Plate", "plate")
+                        .WithMany()
                         .HasForeignKey("PlateId");
 
-                    b.Navigation("Cart");
-
-                    b.Navigation("Plate");
+                    b.Navigation("plate");
                 });
 
             modelBuilder.Entity("Domain.Models.Image", b =>
@@ -426,15 +437,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Models.Plate", null)
                         .WithMany("Images")
                         .HasForeignKey("PlateId");
-                });
-
-            modelBuilder.Entity("Domain.Models.Order.Order", b =>
-                {
-                    b.HasOne("Domain.Models.Authentication.ApplicationUser", "OrderMaker")
-                        .WithMany("Orders")
-                        .HasForeignKey("OrderMakerId");
-
-                    b.Navigation("OrderMaker");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -488,28 +490,14 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Models.Authentication.ApplicationUser", b =>
-                {
-                    b.Navigation("Cart")
-                        .IsRequired();
-
-                    b.Navigation("Orders");
-                });
-
             modelBuilder.Entity("Domain.Models.Cart", b =>
                 {
-                    b.Navigation("CartItems");
-                });
-
-            modelBuilder.Entity("Domain.Models.Order.Order", b =>
-                {
-                    b.Navigation("CartItems");
+                    b.Navigation("CartOwner")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Domain.Models.Plate", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("Images");
                 });
 #pragma warning restore 612, 618

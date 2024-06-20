@@ -24,7 +24,7 @@ namespace Infrastructure.Repositories
             if(check) return new PlateResponse(false, "Plate already exist!");
             var plate = new Plate()
             {
-                PlateId = model.PlateId,
+                Id = model.Id,
                 PlateName = model.PlateName,
                 PlateBio = model.PlateBio,
                 PlatePrice = model.PlatePrice
