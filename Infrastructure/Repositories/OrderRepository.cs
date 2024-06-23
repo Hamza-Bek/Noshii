@@ -87,6 +87,7 @@ namespace Infrastructure.Repositories
             var o = new Order()
             {
                 OrderId = order.OrderId,
+                OrderNumber = GenerateRandomNumberString(5),
                 UserId = userId,
                 OrderDate = order.OrderDate,
                 OrderTotal = orderTotal,
@@ -184,6 +185,20 @@ namespace Infrastructure.Repositories
 
             return new OrderResponse(flag:true  , message:"The cart cleared!");
         }
-    }
+
+		private string GenerateRandomNumberString(int length)
+		{
+			Random random = new Random();
+			char[] digits = new char[length];
+
+			for (int i = 0; i < length; i++)
+			{
+				digits[i] = (char)('0' + random.Next(0, 10));
+			}
+
+			return new string(digits);
+		}
+
+	}
   
 }
