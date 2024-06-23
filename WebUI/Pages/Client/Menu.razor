@@ -2,129 +2,203 @@
 @using System.Security.Claims
 @using Domain.Models.Authentication
 ﻿@using Microsoft.AspNetCore.Components.Authorization
-
-@attribute [Authorize]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>Home</PageTitle>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 @inject HttpClient Http
 @inject IClientService clientService
 @inject IOrderService orderService
-<style>
-   
-
-    .full-background {
-        background-image: url(/imgs/PlatesBG.jpg); /* Replace with your image path */
-        background-size: cover;
-        background-position: center;
-        height: 50vh;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: -1;
-    }
-
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin: 15rem 5vw 4rem;
-        padding-top: 0;
-        list-style-type: none;
-    }
-</style>
-
-<div class="full-background"></div>
 
 @if (plates == null)
 {
-    <p><em>Loading...</em></p>
+	<p><em>Loading...</em></p>
 }
 else
 {
-    <ul class="cards">
-            @foreach (var plate in plates)
-            {                        
-                <li>                    
-                    <a class="card">
-                    <img src="@plate.CoverImageUrl" class="card__image" alt="" />
-                        <div class="card__overlay">
-                            <div class="card__header">
-                                <svg class="card__arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>
-                               
-                                <div class="card__header-text">
-                                    <h3 class="card__title">@plate.PlateName</h3>
-                                    <span class="card__status">$@plate.PlatePrice</span>
-                                </div>
-                                <button @onclick="() => AddPlateToCart(plate.Id)" class="card__add-to-cart">
-                                    Add to Cart
-                                </button>
-                            </div>
-                            <p class="card__description">@plate.PlateBio</p>
-                        </div>
-                    </a>
-                </li>                                
-            }
-        </ul>
+	
 
-        }
+<!-- breadcrumb-section -->
+<div class="breadcrumb-section breadcrumb-bg">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 offset-lg-2 text-center">
+				<div class="breadcrumb-text">
+					<p>Fresh and Organic</p>
+					<h1>Shop</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end breadcrumb section -->
+<!-- products -->
+<div class="product-section mt-150 mb-150">
+	<div class="container">
+		
+		<div class="row product-lists">
+			@foreach(var plate in plates)
+			{
+				<div class="col-lg-4 col-md-6 text-center strawberry">
+					<div class="single-product-item">
+						<div class="product-image">
+							<a href="single-product.html"><img src="@plate.CoverImageUrl" alt=""></a>
+						</div>
+						<h3>@plate.PlateName</h3>
+						<p class="product-price"> @plate.PlatePrice$ </p>
+						<button @onclick="() => AddPlateToCart(plate.Id)" class="card__add-to-cart">
+							Add to Cart
+						</button>
+					</div>
+				</div>
+			}
+		
+			
+		</div>
 
-     
+		<div class="row">
+			<div class="col-lg-12 text-center">
+				<div class="pagination-wrap">
+					<ul>
+						<li><a href="#">Prev</a></li>
+						<li><a href="#">1</a></li>
+						<li><a class="active" href="#">2</a></li>
+						<li><a href="#">3</a></li>
+						<li><a href="#">Next</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end products -->
+
+<!-- footer -->
+<div class="footer-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box about-widget">
+					<h2 class="widget-title">About us</h2>
+					<p>Ut enim ad minim veniam perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae.</p>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box get-in-touch">
+					<h2 class="widget-title">Get in Touch</h2>
+					<ul>
+						<li>34/8, East Hukupara, Gifirtok, Sadan.</li>
+						<li>support@fruitkha.com</li>
+						<li>+00 111 222 3333</li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box pages">
+					<h2 class="widget-title">Pages</h2>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+						<li><a href="about.html">About</a></li>
+						<li><a href="services.html">Shop</a></li>
+						<li><a href="news.html">News</a></li>
+						<li><a href="contact.html">Contact</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-6">
+				<div class="footer-box subscribe">
+					<h2 class="widget-title">Subscribe</h2>
+					<p>Subscribe to our mailing list to get the latest updates.</p>
+					<form action="index.html">
+						<input type="email" placeholder="Email">
+						<button type="submit"><i class="fas fa-paper-plane"></i></button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end footer -->
+<!-- copyright -->
+	<div class="copyright">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-12">
+					<p>
+						Copyrights &copy; 2024 - <a href="https://hamzabek.com/">Hamza Bek</a>,  All Rights Reserved.<br>
+						Distributed By - <a href="https://hamzabek.com/">Liado</a>
+					</p>
+				</div>
+				<div class="col-lg-6 text-right col-md-12">
+					<div class="social-icons">
+						<ul>
+							<li><a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-twitter"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-instagram"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+							<li><a href="#" target="_blank"><i class="fab fa-dribbble"></i></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end copyright -->
+<!-- end copyright -->
+}
 @code {
-    private string userId;
-    public IEnumerable<PlateDTO>? plates { get; set; }
-    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+	private string userId;
+	public IEnumerable<PlateDTO>? plates { get; set; }
+	[CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            plates = await plateService.GetAllPlates();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching plates: {ex.Message}");
-        }
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			plates = await plateService.GetAllPlates();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error fetching plates: {ex.Message}");
+		}
+	}
 
-    private async Task AddPlateToCart(string plateId)
-    {
-        var authState = await AuthStateTask;
-
-
-
-        foreach (var claim in authState.User.Claims)
-        {
-            Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
-        }
-
-        var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
-        if (userIdClaim != null)
-        {
-            userId = userIdClaim.Value;
-
-            var getUserCart = await orderService.GetUserCart(userId);
-            if(getUserCart.IsOrdered == true)
-            {
-                await js.InvokeVoidAsync("alert", "Please wait until your order is finished");
-            }
-            else
-            {
-                var response = await clientService.AddPlateToCart(plateId, userId);
-                await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
-            }
-     
-        }
-        else
-        {
-            await js.InvokeVoidAsync("alert", "Something went wrong");
-        }
-
-        // Assuming userId is fetched from a user service or stored in the component
-        // Replace with actual user ID retrieval logic
+	private async Task AddPlateToCart(string plateId)
+	{
+		var authState = await AuthStateTask;
 
 
 
-    }
+		foreach (var claim in authState.User.Claims)
+		{
+			Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
+		}
+
+		var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+		if (userIdClaim != null)
+		{
+			userId = userIdClaim.Value;
+
+			var getUserCart = await orderService.GetUserCart(userId);
+			if (getUserCart.IsOrdered == true)
+			{
+				await js.InvokeVoidAsync("alert", "Please wait until your order is finished");
+			}
+			else
+			{
+				var response = await clientService.AddPlateToCart(plateId, userId);
+				await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
+			}
+
+		}
+		else
+		{
+			await js.InvokeVoidAsync("alert", "Something went wrong");
+		}
+
+		// Assuming userId is fetched from a user service or stored in the component
+		// Replace with actual user ID retrieval logic
+
+
+
+	}
 }

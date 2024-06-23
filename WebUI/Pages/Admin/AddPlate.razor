@@ -6,35 +6,73 @@
 @attribute [Authorize(Roles = Constants.Role.Admin)]
 
 
-<PageTitle>PLate</PageTitle>
 
-<h1>Plate</h1>
-
-
-
-<h3>Add New Plate</h3>
-
-<EditForm Model="plate" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div>
-        <label for="plateName">Plate Name:</label>
-        <InputText id="plateName" @bind-Value="plate.PlateName" class="form-control" />
+<!-- breadcrumb-section -->
+<div class="breadcrumb-section breadcrumb-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div class="breadcrumb-text">
+                    <p>Add new</p>
+                    <h1>Plates</h1>       
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <label for="plateBio">Plate Bio:</label>
-        <InputText id="plateBio" @bind-Value="plate.PlateBio" class="form-control" />
+</div>
+<!-- end breadcrumb section -->
+
+
+
+<div class="container">
+    <div class="wrapper">
+        <ul class="steps">
+            <li class="is-active">Step 1</li>
+            <li>Step 2</li>
+            <li>Step 3</li>
+        </ul>
+        <form class="form-wrapper">
+
+            <EditForm Model="plate" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            <fieldset class="section is-active">
+                <h3>Plate Details</h3>
+                <InputText type="text" name="name" id="plateName" @bind-Value="plate.PlateName" placeholder="Name"/>
+                    <InputText type="text" name="bio" id="plateBio" @bind-Value="plate.PlateBio" placeholder="Bio" />
+                    <InputNumber type="text" name="price" id="platePrice" @bind-Value="plate.PlatePrice" placeholder="Price" />
+                <div class="button">Next</div>
+            </fieldset>
+            <fieldset class="section">
+                <h3>Plate Image</h3>
+          
+                    <div class="file-upload">
+                        <div class="file-select">
+                            <div class="file-select-button" id="fileName">Choose File</div>
+                            <div class="file-select-name" id="noFile">No file chosen...</div>
+                            <InputFile OnChange="SelectPlateImage" multiple="false" type="file" name="chooseFile" id="chooseFile"/>
+                        </div>
+                    </div>
+              
+                <div class="button">Next</div>
+            </fieldset>
+            <fieldset class="section">
+                <h3>Confirm</h3>
+                    
+                <input class="submit button" type="submit" value="Add plate">
+            </fieldset>
+            <fieldset class="section">
+                <h3>Plate added!</h3>
+                <p>Plate added to the database successfuly</p>
+                <div class="button">Reset Form</div>
+            </fieldset>
+        </EditForm>
+        </form>
+       
     </div>
-    <div>
-        <label for="platePrice">Plate Price:</label>
-        <InputNumber id="platePrice" @bind-Value="plate.PlatePrice" class="form-control" />
-    </div>
-    <div>
-        <InputFile OnChange="SelectPlateImage" multiple="false" />
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</EditForm>
+</div>
+
+<script src="/js/AppPlate.js"></script>
 
 @code {
     private const int MaxAllowedFileSize = 1024 * 1024 * 10;
@@ -111,4 +149,6 @@
         // check for multiple files
         // TODO: Yours to implement if needed ;-)
     }
+
+ 
 }  

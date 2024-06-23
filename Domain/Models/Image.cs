@@ -8,7 +8,7 @@ namespace Domain.Models
 {
     public class Image
     {
-        public string Id { get; set; } = null!;
+        public string imageId { get; set; } = null!;
 
         public string Url { get; set; } = null!;
 

@@ -79,7 +79,7 @@ namespace Application.Services
 
         public async Task<PlateResponse> RemovePlateAsync(string id)
         {
-            var response = await _httpClient.DeleteAsync($"api/plate/delete/plate{id}");
+            var response = await _httpClient.DeleteAsync($"api/plate/delete/plate/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return new PlateResponse { flag = true, message = "Item deleted successfully." };

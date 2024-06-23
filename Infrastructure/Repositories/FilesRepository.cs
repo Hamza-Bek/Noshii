@@ -2,6 +2,7 @@ using Application.DTOs.Response;
 using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
@@ -32,46 +33,26 @@ public class FilesRepository : IFilesRepository
 
     public async Task<GeneralResponse> DeleteImageAsync(string imageId)
     {
-        var image = await _context.Images.FindAsync(imageId);
+		var imageToDelete = await _context.Images.FindAsync(imageId);
 
-        // TODO: Same as before buddy!
+		if (imageToDelete is not null)
+		{
+			File.Delete(imageToDelete.AbsolutePath!); // we know for a fact, the Path cannot be null
 
-        _context.Images.Remove(image!);
+			var result = _context.Images.Remove(imageToDelete);
 
-        // IMPORTANT: Delete the image from the file system
-        try
-        {
-            File.Delete(image?.AbsolutePath!);
-        }
-        catch (ArgumentNullException) // TODO: In case the file deletion failed, re add the image to the database
-        {
-            _context.Images.Add(image!);
-            await _context.SaveChangesAsync();
+			if (result.State == EntityState.Deleted)
+			{
+				await _context.SaveChangesAsync();
+			}
+		}
+		else
+		{
+			return new GeneralResponse(Flag: false,Message: "The image doesn't exist in the system");
+		}
 
-            return new GeneralResponse()
-            {
-                Flag = false,
-                Message = "Failed to delete image"
-            };
-        }
-        catch (IOException)
-        {
-            _context.Images.Add(image!);
-            await _context.SaveChangesAsync();
-
-            return new GeneralResponse()
-            {
-                Flag = false,
-                Message = "Failed to delete image"
-            };
-        }
-
-        return new GeneralResponse()
-        {
-            Flag = true,
-            Message = "Image deleted successfully"
-        };
-    }
+		return new GeneralResponse(Flag: true, Message: "The image deleted!");
+	}
 
 
     // TODO: These are yours to implement!

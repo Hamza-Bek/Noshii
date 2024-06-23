@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.Response
 {
-    public record PlateResponse(bool flag = false, string message =null!);
+    public record PlateResponse(bool flag = false, string message =null! , string coverImageUrl = null!);
 }

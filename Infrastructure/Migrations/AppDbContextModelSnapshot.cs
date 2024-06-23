@@ -177,7 +177,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.Image", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("imageId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AbsolutePath")
@@ -191,7 +191,7 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("imageId");
 
                     b.HasIndex("PlateId");
 

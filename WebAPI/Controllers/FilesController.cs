@@ -55,7 +55,7 @@ public class FilesController : ControllerBase
             // Save the image record to the database
             var image = new Image()
             {
-                Id = Guid.NewGuid().ToString(),
+                imageId = Guid.NewGuid().ToString(),
                 Url = imageUrl,
                 AbsolutePath = imageFilePath
             };
@@ -64,7 +64,7 @@ public class FilesController : ControllerBase
 
             if (response.Flag == true) // Everything went well
             {
-                return Ok(new ImageResponse(image.Id, image.Url));
+                return Ok(new ImageResponse(image.imageId, image.Url));
             }
             else // An exception was thrown
             {
@@ -80,5 +80,23 @@ public class FilesController : ControllerBase
             // Return a 500 Internal Server Error with a generic message
             return StatusCode(500, "Internal server error occurred. Please contact support.");
         }
+
+
+
+
     }
+
+	[HttpDelete("delete-image/{imageId}")]
+	public async Task<IActionResult> DeleteImage(string imageId)
+	{
+		try
+		{
+			await _filesRepository.DeleteImageAsync(imageId);
+            return Ok();
+		}
+		catch (Exception ex)
+		{
+            throw new Exception(ex.Message);
+		}
+	}
 }

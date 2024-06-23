@@ -33,8 +33,16 @@ public class FilesService : IFilesService
     }
 
     public async Task<GeneralResponse> DeleteImageAsync(string imageId)
-    {
-        // TODO: Implement this ;-)
-        throw new NotImplementedException();
-    }
+    {	
+		var response = await _httpClient.DeleteAsync($"api/files/delete-image/{imageId}");
+
+		if (!response.IsSuccessStatusCode)
+		{
+			var error = await response.Content.ReadFromJsonAsync<GeneralResponse>();
+            return new GeneralResponse(Flag: false, Message: "Failed to remove the image");
+		}
+
+		var result = await response.Content.ReadFromJsonAsync<GeneralResponse>();
+		return result!;
+	}
 }

@@ -13,13 +13,18 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public PlateRepository(AppDbContext context, IMapper mapper)
+        private readonly IFilesRepository _filesRepository;
+        public PlateRepository(AppDbContext context, IMapper mapper, IFilesRepository filesRepository)
         {
             _context = context;
             _mapper = mapper;
+            _filesRepository = filesRepository;
         }
         public async Task<PlateResponse> AddPlateAsync(PlateDTO model)
         {
+            if(model == null)
+                return new PlateResponse(flag:false , message:"Can not insert null values");
+
             var check = _context.Plates.Any(x => x.PlateName == model.PlateName);
             if(check) return new PlateResponse(false, "Plate already exist!");
             var plate = new Plate()
@@ -59,8 +64,19 @@ namespace Infrastructure.Repositories
 
         public async Task<PlateResponse> RemovePlateAsync(string id)
         {
-            var plate = await _context.Plates.FindAsync(id);
-            if (plate == null) return new PlateResponse(false, "Plate not found!");
+			var plate = await _context.Plates
+							  .Include(p => p.Images)
+							  .FirstOrDefaultAsync(p => p.Id == id);
+			if (plate == null) return new PlateResponse(false, "Plate not found!");
+			
+
+			if (plate.Images is not null && plate.Images.Any())
+            {
+				for (int i = 0; i < plate.Images.Count; i++)
+				{
+					await _filesRepository.DeleteImageAsync(plate.Images.ElementAt(i).imageId);
+				}
+			}
 
             _context.Plates.Remove(plate);
             await SaveChangesAsync();

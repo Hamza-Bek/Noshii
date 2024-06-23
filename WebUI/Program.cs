@@ -2,6 +2,7 @@ using Application.Extensions;
 using Application.Interfaces;
 using Application.Services;
 using Blazored.LocalStorage;
+using NetcodeHub.Packages.Components.Toast;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -20,6 +21,9 @@ builder.Services.AddAuthorizationCore(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
+
+
+builder.Services.AddScoped<NetcodeHubToast>();
 
 builder.Services.AddScoped<HttpClientService>();
 builder.Services.AddScoped<CustomHttpHandler>();

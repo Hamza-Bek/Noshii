@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
             var result = await _plateRepository.EditPlateAsync(model);
             return Ok(result);
         }
-        [HttpDelete("delete/plate{plateId}")]
+        [HttpDelete("delete/plate/{plateId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]

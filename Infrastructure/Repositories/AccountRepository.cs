@@ -120,12 +120,13 @@ namespace Infrastructure.Repositories
             {
                 if (await FindUserByEmailAsync(model.Email) != null)
                     return new GeneralResponse(false, "Sorry user already exist");
+
                 var user = new ApplicationUser()
                 {
                     Name = model.Name,
                     Email = model.Email,
                     PasswordHash = model.Password,
-                    UserName = model.Email
+                    UserName = model.Email                    
                 };
 
                 var cart = new Cart()
@@ -134,20 +135,18 @@ namespace Infrastructure.Repositories
                    UserId = user.Id                   
                 };
 
+
                 user.CartId = cart.Id;
                 await _context.Carts.AddAsync(cart);
-              
+
+                const string defaultRole = "User";                
+
                 var result = await userManager.CreateAsync(user, model.Password);
-
-                
-                
+                                
                 string error = CheckResponse(result);
-
                 if (!string.IsNullOrEmpty(error)) return new GeneralResponse(false, error);
 
-          
-
-                var response = await AssignUserToRole(user, new IdentityRole() { Name = model.Role });
+                var response = await AssignUserToRole(user, new IdentityRole { Name = defaultRole });          
 
                 string jwtToken = await GenerateToken(user);
                 string refreshToken = GenerateRefreshToken();
