@@ -62,8 +62,7 @@ else
 											</select>
 											<button class="btn btn-primary" @onclick="@(async () => await ChangeOrderStatusAsync(order.OrderId, order.OrderStatus))">Change Status</button>
 											<button class="btn btn-secondary mt-2" onclick="toggleDetails('order-details-@order.OrderId')">Show Order Details</button>
-										</td>
-										
+										</td>										
 									</tr>
 
 									<tr id="order-details-@order.OrderId" class="order-details" style="display: none;">
