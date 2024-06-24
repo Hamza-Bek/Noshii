@@ -3,7 +3,7 @@ using Application.DTOs.Response;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Models;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;

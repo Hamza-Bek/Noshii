@@ -8,7 +8,7 @@ namespace Application.DTOs.Request.Order
 {
     public class CartItemDTO
     {
-        public string? Id { get; set; }
+        public string Id { get; set; }        
         public string? CartId { get; set; }
         public string? PlateId { get; set; }
         public string? PlateName { get; set; }

@@ -31,6 +31,7 @@ else
 	</div>
 </div>
 <!-- end breadcrumb section -->
+
 <!-- products -->
 <div class="product-section mt-150 mb-150">
 	<div class="container">
@@ -118,6 +119,7 @@ else
 	</div>
 </div>
 <!-- end footer -->
+
 <!-- copyright -->
 	<div class="copyright">
 		<div class="container">
@@ -142,8 +144,9 @@ else
 			</div>
 		</div>
 	</div>
-	<!-- end copyright -->
 <!-- end copyright -->
+
+
 }
 @code {
 	private string userId;
@@ -177,18 +180,25 @@ else
 		if (userIdClaim != null)
 		{
 			userId = userIdClaim.Value;
-
-			var getUserCart = await orderService.GetUserCart(userId);
-			if (getUserCart.IsOrdered == true)
+			var response = await clientService.AddPlateToCart(plateId, userId);
+			if(response.flag)
 			{
-				await js.InvokeVoidAsync("alert", "Please wait until your order is finished");
+				await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
 			}
 			else
 			{
-				var response = await clientService.AddPlateToCart(plateId, userId);
-				await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
+				await js.InvokeVoidAsync("alert", "Something went wrong");
 			}
-
+			// var getUserCart = await orderService.GetUserCart(userId);
+			// if (getUserCart.IsOrdered == true)
+			// {
+			// 	await js.InvokeVoidAsync("alert", "Please wait until your order is finished");
+			// }
+			// else
+			// {
+			// 	var response = await clientService.AddPlateToCart(plateId, userId);
+			// 	await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
+			// }
 		}
 		else
 		{

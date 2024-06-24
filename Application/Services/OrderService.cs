@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.Request.Order;
 using Application.DTOs.Response;
 using Application.Extensions;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text;

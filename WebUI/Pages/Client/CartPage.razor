@@ -205,7 +205,7 @@
 <!-- end copyright -->
 
 <!-- end copyright -->
-					@code {
+@code {
 	[CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
 	private string userId;
 	private string cartId;
@@ -264,20 +264,35 @@
 
 		try
 		{
-			var response = await orderService.PlaceOrder(userId, cartId);
-			if (response.flag)
+			if (plates == null || !plates.Any())
 			{
-				// Handle success (e.g., display a success message, redirect to another page, etc.)
-				await orderService.ClearCartItems(userId);
-				NavManager.NavigateTo("/client/order");
-				Console.WriteLine("Order placed successfully.");
-
+				await js.InvokeVoidAsync("alert", "No plates in the cart!");
+				isLoading = false;
+				return;
 			}
 			else
 			{
-				// Handle failure (e.g., display an error message)
-				Console.WriteLine("Failed to place order.");
+				var response = await orderService.PlaceOrder(userId, cartId);
+				if (response.flag)
+				{
+					// Handle success (e.g., display a success message, redirect to another page, etc.)
+					var clearCart = await orderService.ClearCartItems(userId);
+					if (clearCart.flag)
+					{
+
+						// Optionally reload the order details or update the UI state
+						Console.WriteLine("User cart total cleared!");
+					}
+					else
+					{
+						Console.WriteLine($"Error: {clearCart.message}");
+					}
+					await orderService.ClearCartTotal(userId);
+					NavManager.NavigateTo("/client/order");
+					Console.WriteLine("Order placed successfully.");
+				}
 			}
+		
 		}
 		catch (Exception ex)
 		{

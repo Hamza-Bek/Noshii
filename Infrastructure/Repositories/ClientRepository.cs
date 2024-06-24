@@ -59,7 +59,7 @@ namespace Infrastructure.Repositories
                     PlateName = plate.PlateName,
                     PlatePrice = plate.PlatePrice,
                     Quantity = Quantity,
-                    Total = Quantity * plate.PlatePrice
+                    Total = Quantity * plate.PlatePrice,                  
                 };
 
                 getUserCart.CartTotal += (decimal)c.Total;

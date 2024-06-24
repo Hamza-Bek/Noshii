@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Models.Order
+namespace Domain.Models.OrderEntities
 {
     public class OrderStatus
     {

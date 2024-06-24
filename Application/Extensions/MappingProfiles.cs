@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.Request.Order;
 using AutoMapper;
 using Domain.Models;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 
 namespace Application.Extensions
 {

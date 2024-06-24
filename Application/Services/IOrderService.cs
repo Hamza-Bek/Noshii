@@ -1,7 +1,7 @@
 ﻿using Application.DTOs.Request.Order;
 using Application.DTOs.Response;
 using Domain.Models;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

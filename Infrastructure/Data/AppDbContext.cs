@@ -1,8 +1,9 @@
 ﻿using Domain.Models;
 using Domain.Models.Authentication;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 
 namespace Infrastructure.Data
@@ -32,6 +33,24 @@ namespace Infrastructure.Data
             .HasForeignKey<Cart>(c => c.UserId)
           .OnDelete(DeleteBehavior.NoAction);
 
-        }
-    }
+			builder.Entity<Order>()
+				.HasMany(o => o.GetOrderDetails)
+				.WithOne(od => od.Order)
+				.HasForeignKey(od => od.OrderId)
+				  .OnDelete(DeleteBehavior.Cascade);
+
+			builder.Entity<OrderDetails>()
+		 .HasKey(od => od.OrderDetailId);
+
+			builder.Entity<OrderDetails>()
+				.Property(od => od.PlateName)
+				.IsRequired();
+
+			builder.Entity<OrderDetails>()
+				.Property(od => od.Quantity)
+				.IsRequired();
+
+
+		}
+	}
 }

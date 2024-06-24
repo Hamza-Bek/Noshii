@@ -2,7 +2,7 @@
 using Application.DTOs.Request.Order;
 using Application.DTOs.Response;
 using Domain.Models;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 
 namespace Application.Interfaces
 {

@@ -3,9 +3,10 @@ using Application.DTOs.Response;
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
-using Domain.Models.Order;
+using Domain.Models.OrderEntities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace Infrastructure.Repositories
@@ -32,9 +33,15 @@ namespace Infrastructure.Repositories
             return new OrderResponse(true, "Status changed");
         }
 
-        public async Task<IEnumerable<Order>> GetAllOrders()=> await context.Orders.AsNoTracking().ToListAsync();
+        public async Task<IEnumerable<Order>> GetAllOrders()
+		{
+			return await context.Orders
+								.Include(o => o.OrderMaker)
+                                .Include(g => g.GetOrderDetails)
+								.ToListAsync();
+		}
 
-        public async Task<IEnumerable<Order>> GetOrder(string userId)
+		public async Task<IEnumerable<Order>> GetOrder(string userId)
         {
             var getUser = await context.Users.FindAsync(userId);
             if (getUser == null)
@@ -44,11 +51,9 @@ namespace Infrastructure.Repositories
             }
 
             var getUserOrders = await context.Orders
-       .Where(o => o.UserId == getUser.Id)
-       .Include(o => o.OrderMaker) // Eager load OrderMaker
-       .Include(o => o.CartItems) // Eager load CartItems
-           .ThenInclude(ci => ci.Plate) // Eager load Plate for each CartItem
-       .ToListAsync();
+                    .Where(o => o.UserId == getUser.Id)
+                    .Include(o => o.OrderMaker) // Eager load OrderMaker                    
+                    .ToListAsync();
 
             if (getUserOrders == null || !getUserOrders.Any())
             {
@@ -91,10 +96,17 @@ namespace Infrastructure.Repositories
                 UserId = userId,
                 OrderDate = order.OrderDate,
                 OrderTotal = orderTotal,
-                OrderStatus = order.OrderStatus
-            };
+                OrderStatus = order.OrderStatus,
+                OrderMaker = getUser,
+				GetOrderDetails = getUserCart.CartItems.Select(cartitem => new OrderDetails
+				{
+                    OrderDetailId = Guid.NewGuid().ToString(),
+					PlateName = cartitem.PlateName,
+					Quantity = cartitem.Quantity
+				}).ToList()
+			};
 
-            getUserCart.IsOrdered = true;
+           // getUserCart.IsOrdered = true;
             
             context.Orders.Add(o);
             // Remove cart items from the database
