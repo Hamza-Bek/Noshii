@@ -24,6 +24,7 @@ namespace Application.Services
             _httpClient = httpClient;
             this.httpClientService = httpClientService;
         }
+
         public async Task<PlateResponse> AddPlateAsync(PlateDTO model)
         {
             try
@@ -96,6 +97,17 @@ namespace Application.Services
                 return $"sorry unkown error occured.{Environment.NewLine} Error Description : {Environment.NewLine} Status Code : {response.StatusCode}{Environment.NewLine} Reason Phrase : {response.ReasonPhrase}";
             else
                 return null!;
+        }
+
+        public async Task<Dictionary<string, string>> GetCategories()
+        {
+            var response = await _httpClient.GetAsync("api/plate/get/categories");
+            if(response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                return data!;
+            }
+            throw new Exception();
         }
     }
 }

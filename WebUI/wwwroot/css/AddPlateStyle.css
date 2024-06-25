@@ -144,6 +144,12 @@ fieldset {
 
 /* FORM */
 
+.button.back {
+    position: relative;
+    padding-block:100px;
+}
+
+
 .form-wrapper .section {
     padding: 0px 20px 30px 20px;
     -webkit-box-sizing: border-box;

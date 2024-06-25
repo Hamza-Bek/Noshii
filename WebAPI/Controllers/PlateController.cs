@@ -3,6 +3,7 @@ using Application.Extensions;
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
@@ -13,12 +14,13 @@ namespace WebAPI.Controllers
     {
         private readonly IPlateRepository _plateRepository;
         private readonly IAccountRepository _aacountRepository;
-
+        public readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public PlateController(IPlateRepository plateRepository, IMapper mapper)
+        public PlateController(IPlateRepository plateRepository, IMapper mapper, AppDbContext context)
         {
             _plateRepository = plateRepository;
             _mapper = mapper;
+            _context = context; 
         }
 
         [HttpGet("get/plates")]
@@ -69,6 +71,30 @@ namespace WebAPI.Controllers
         {
             var result = await _plateRepository.RemovePlateAsync(plateId);
             return Ok(result);
+        }
+
+
+
+		[HttpPost("add/category")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		public async Task<IActionResult> AddCategory([FromBody] Category model)
+		{
+			var result = await _plateRepository.AddCategory(model);
+			return Ok(result);
+		}
+
+
+        [HttpGet("get/categories")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> GetCategoryAsync()
+        {
+            var categories = _context.Categories.ToList(); // GET ALL CATEGORIES FROM THE DB
+
+            var categoriesDic = categories.ToDictionary(e => e.CategoryId , e => e.CategoryTag);
+
+            return Ok(categoriesDic);
         }
     }
 }

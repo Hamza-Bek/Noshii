@@ -41,11 +41,10 @@
                 <InputText type="text" name="name" id="plateName" @bind-Value="plate.PlateName" placeholder="Name"/>
                     <InputText type="text" name="bio" id="plateBio" @bind-Value="plate.PlateBio" placeholder="Bio" />
                     <InputNumber type="text" name="price" id="platePrice" @bind-Value="plate.PlatePrice" placeholder="Price" />
-                <div class="button">Next</div>
+                    <div class="button next">Next</div>
             </fieldset>
             <fieldset class="section">
-                <h3>Plate Image</h3>
-          
+                <h3> Plate Image</h3>                                       
                     <div class="file-upload">
                         <div class="file-select">
                             <div class="file-select-button" id="fileName">Choose File</div>
@@ -53,37 +52,95 @@
                             <InputFile OnChange="SelectPlateImage" multiple="false" type="file" name="chooseFile" id="chooseFile"/>
                         </div>
                     </div>
-              
-                <div class="button">Next</div>
+                    <div class="button-container">
+                        <div class="button back">Back</div>
+                        <div class="button next">Next</div>
+                    </div>
+                  
             </fieldset>
-            <fieldset class="section">
-                <h3>Confirm</h3>
-                    
-                <input class="submit button" type="submit" value="Add plate">
-            </fieldset>
-            <fieldset class="section">
-                <h3>Plate added!</h3>
-                <p>Plate added to the database successfuly</p>
-                <div class="button">Reset Form</div>
-            </fieldset>
+                <fieldset class="section">
+                    <h3>Category</h3>
+                    <div class="row cf">
+
+
+                        @foreach (var kvp in Categories)
+                        {
+                            <div class="four col">
+                                <input type="radio" name="category" id="@($"category_{kvp.Key}")" value="@kvp.Value"  @onchange="@(e => plate.CategoryTag = kvp.Value)">
+                                <label for="@($"category_{kvp.Key}")">
+                                    <h4>@kvp.Value</h4>
+                                </label>
+                            </div>
+                        }
+                        
+
+                       
+                       
+                    </div>
+                    <div class="button-container">
+                        <div class="button back">Back</div>                        
+                    </div>
+                    <input class="submit button" type="submit" value="Add plate">                                                     
+                </fieldset>
+            
         </EditForm>
+          
         </form>
        
     </div>
 </div>
 
+<style>
+    .section.is-active {
+        position: relative; /* Ensure the fieldset is relatively positioned */
+    }
+
+        .section.is-active .next {
+            position: absolute;
+            bottom: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+        }
+
+    .button-container {
+        text-align: right; /* Aligns its child elements (buttons) to the right */
+        display: flex;
+        justify-content: space-between; /* Aligns items with space between them */
+        margin-top: 20px; /* Adjust margin as needed */
+    }
+
+    .button.back {
+        position: relative;
+        left: 0; /* Positions the "Back" button to the left */
+    }
+
+    .button.next {
+        position: relative;
+        right: 0; /* Positions the "Next" button to the right */     
+    }
+
+</style>
 <script src="/js/AppPlate.js"></script>
 
 @code {
     private const int MaxAllowedFileSize = 1024 * 1024 * 10;
     private string _errorMessage = string.Empty;
     public PlateDTO plate = new PlateDTO();
+    Dictionary<string, string> Categories = new();
     private List<IFormFile> _selectedImages = new();
     private readonly IEnumerable<string> _allowedFileExtensions = [".jpeg", ".png", ".jpg", ".webp"];
 
-    private async Task HandleValidSubmit()
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("We began submitting!");
+        await GetData();
+        // Ensure plate.CategoryTag is properly initialized
+        if (Categories.Any())
+        {
+            plate.CategoryTag = Categories.Keys.First();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {         
         plate.Id = Guid.NewGuid().ToString();
         var result = await plateService.AddPlateAsync(plate);
 
@@ -150,5 +207,21 @@
         // TODO: Yours to implement if needed ;-)
     }
 
- 
+    private async Task GetData()
+    {
+        try
+        {
+            Categories = await plateService.GetCategories();
+            Console.WriteLine("Categories fetched successfully.");
+            foreach (var category in Categories)
+            {
+                Console.WriteLine($"Key: {category.Key}, Value: {category.Value}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching categories: {ex.Message}");
+        }
+    }
+
 }  

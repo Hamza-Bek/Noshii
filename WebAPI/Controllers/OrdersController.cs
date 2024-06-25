@@ -57,10 +57,10 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> GetAllStatusesDic()
         {
 
-            var brands = context.OrderStatuses.ToList(); // Retrieve all employees from the database
+            var statuses = context.OrderStatuses.ToList(); // Retrieve all statuses from the database
 
             // Create a dictionary where the key is the ID and the value is the name
-            var brandsDictionary = brands.ToDictionary(e => e.Id, e => e.Status);
+            var brandsDictionary = statuses.ToDictionary(e => e.Id, e => e.Status);
 
             return Ok(brandsDictionary);
 

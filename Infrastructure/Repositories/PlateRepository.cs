@@ -27,12 +27,18 @@ namespace Infrastructure.Repositories
 
             var check = _context.Plates.Any(x => x.PlateName == model.PlateName);
             if(check) return new PlateResponse(false, "Plate already exist!");
-            var plate = new Plate()
+
+            var getCategory = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryTag == model.CategoryTag);
+            if(getCategory.CategoryTag == null)
+				return new PlateResponse(false, "Category not found!");
+
+			var plate = new Plate()
             {
                 Id = model.Id,
                 PlateName = model.PlateName,
                 PlateBio = model.PlateBio,
-                PlatePrice = model.PlatePrice
+                PlatePrice = model.PlatePrice,
+                CategoryTag = model.CategoryTag
             };
             
             _context.Plates.Add(plate);
@@ -40,7 +46,23 @@ namespace Infrastructure.Repositories
             return new PlateResponse(true, "Plate Added!");
         }
 
-        public async Task<PlateResponse> EditPlateAsync(Plate model)
+		public async Task<PlateResponse> AddCategory(Category model)
+		{
+			if (model == null)
+				return new PlateResponse(flag: false, message: "Can not insert null values");
+
+            var newCategory = new Category()
+            {
+                CategoryId = Guid.NewGuid().ToString(),
+				CategoryTag = model.CategoryTag,
+            };
+
+            _context.Categories.Add(newCategory);
+            await SaveChangesAsync();
+			return new PlateResponse(flag: true, message: "Category added successfully");
+		}
+
+		public async Task<PlateResponse> EditPlateAsync(Plate model)
         {
             _context.Plates.Update(model);
             await SaveChangesAsync();
@@ -84,5 +106,7 @@ namespace Infrastructure.Repositories
         }
 
         private async Task SaveChangesAsync() => await _context.SaveChangesAsync();
+
+        public async Task<IEnumerable<Category>> GetCategoriesAsync() => await _context.Categories.AsNoTracking().ToListAsync();
     }
 }

@@ -13,9 +13,10 @@ namespace Application.Services
     {
         Task<IEnumerable<PlateDTO>> GetAllPlates();        
         Task<Plate> GetPlateByName(string plateName);
+        Task<Dictionary<string, string>> GetCategories();
 
         //..//
-        
+
         Task<PlateResponse> AddPlateAsync(PlateDTO model);
         Task<PlateResponse> EditPlateAsync(Plate model);
         Task<PlateResponse> RemovePlateAsync(string id);

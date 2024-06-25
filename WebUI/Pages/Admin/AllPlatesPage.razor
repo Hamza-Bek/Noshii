@@ -41,6 +41,7 @@ else
 									<th class="product-name">Name</th>
 									<th class="product-price">Description</th>
 									<th class="product-quantity">Price</th>
+									<th class="product-quantity">Category</th>
 									<th class="product-total">Actions</th>
 								</tr>
 							</thead>
@@ -53,6 +54,7 @@ else
 										<td class="product-name">@plate.PlateName</td>
 										<td class="product-name">@plate.PlateBio</td>
 										<td class="product-name">$@plate.PlatePrice</td>
+										<td class="product-name">@plate.CategoryTag</td>
 										<td>
 											<a @onclick="() => DeletePlate(plate.Id)">
 												<i class="fas fa-trash text-danger"></i>

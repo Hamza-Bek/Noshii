@@ -13,7 +13,8 @@ public static class PlatesMapper
             PlateName = plate.PlateName,
             PlatePrice = plate.PlatePrice,
             PlateBio = plate.PlateBio,
-            CoverImageUrl = plate.Images.First().Url
+            CoverImageUrl = plate.Images.First().Url,
+            CategoryTag = plate.CategoryTag
         };
     }
 }

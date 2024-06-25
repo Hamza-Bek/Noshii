@@ -121,6 +121,7 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<OrderStatus>> GetStatusesAsync() => await context.OrderStatuses.AsNoTracking().ToListAsync();
 
         public async Task<IEnumerable<OrderStatus>> GetAllStatusesAsync() => await context.OrderStatuses.AsNoTracking().ToListAsync();
+
         private async Task SaveChangesAsync() => await context.SaveChangesAsync();
 
         public async Task<OrderResponse> ClearCartTotal(string userId)

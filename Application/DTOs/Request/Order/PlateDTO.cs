@@ -14,5 +14,6 @@ namespace Application.DTOs.Request.Order
         public string? PlateBio { get; set; }
         public decimal? PlatePrice { get; set; }
         public string? CoverImageUrl { get; set; }
-    }
+		public string? CategoryTag { get; set; }
+	}
 }
