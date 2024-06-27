@@ -2344,10 +2344,7 @@ ul.social-link-team li a {
 
 # Shop Page Styles
 
------------------------------------------------------------------------------ */
-.product-filters {
-  margin-bottom: 80px;
-}
+----------------------------------------------------------------------------- */.product-filters {    margin-bottom: 20px;    margin-top: -100px;}
 
 .product-filters ul {
   margin: 0;

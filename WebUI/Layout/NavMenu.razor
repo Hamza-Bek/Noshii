@@ -1,85 +1,101 @@
-﻿@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components.Authorization
+﻿@inherits LayoutComponentBase
 
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 
-<!--PreLoader-->
+<div>
+    @if (ShowNavBar)
+    {
+        <!-- Navigation Bar Code -->
+        <div class="top-header-area " id="sticker">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12 text-center">
+                        <div class="main-menu-wrap">
+                            <!-- logo -->
+                            <div class="site-logo">
+                                <a href="index.html">
+                                    <img src="/imgs/logo.png" alt="">
+                                </a>
+                            </div>
+                            <!-- logo -->
+                            <!-- menu start -->
 
-<!--PreLoader Ends-->
-<!-- header -->
-<body>
-
-
-<div class="top-header-area " id="sticker">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12 col-sm-12 text-center">
-				<div class="main-menu-wrap">
-					<!-- logo -->
-					<div class="site-logo">
-						<a href="index.html">
-							<img src="/imgs/logo.png" alt="">
-						</a>
-					</div>
-					<!-- logo -->
-					<!-- menu start -->
-
-					<nav class="main-menu">
-						<ul>
-							<li class="current-list-item">
-								<a href="/">Home</a>							
-							</li>
-								<li><a href="/client/menu">Menu</a></li>
-						
-						
-							<li><a href="/client/order">Orders </a></li>
-							 <AuthorizeView Policy="AdminOnly">
-							   <Authorized>
-							<li>
-								<a href="#">Admin</a>
-								<ul class="sub-menu">
-												<li><a href="/admin/plate/add">Add new plate</a></li>
-												<li><a href="/admin/plates/">All plates</a></li>
-												<li><a href="/admin/orders">All orders</a></li>
-												<li><a href="/admin/identity/users">all users</a></li>
-								</ul>
-							</li>
-								</Authorized>
-							</AuthorizeView>
-								<li>
-									<div class="header-icons">
-										<a class="shopping-cart" href="/client/cart/home"><i class="fas fa-shopping-cart"></i></a>
-									</div>
-								</li>
-							<li>
-								<div class="header-icons">
-
-									
-								    <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-solid fa-user"></i></a>
-										<AuthorizeView>
-											<Authorized>
-												<ul class="sub-menu">
-													<li><a class="text-danger" href="account/identity/logout">Logout</a></li>
-												</ul>
-											</Authorized>
-										
-										<NotAuthorized>
-										<ul class="sub-menu">
-											<li><a href="account/identity/login">Login</a></li>
-											<li><a href="account/identity/register">Register</a></li>
-										</ul>
-											</NotAuthorized>
-										</AuthorizeView>
-								</div>
-							</li>
-						</ul>
-					</nav>
-						<a class="mobile-show search-bar-icon" href="#"><i class="fa-regular fa-user"></i></a>
-					<div class="mobile-menu"></div>
-					<!-- menu end -->
-				</div>
-			</div>
-		</div>
-	</div>
+                            <nav class="main-menu">
+                                <ul>
+                                    <li class="current-list-item">
+                                        <a href="/">Home</a>
+                                    </li>
+                                    <li><a href="/client/menu">Menu</a></li>
+                                    <li><a href="/client/order">Orders</a></li>
+                                    <AuthorizeView Policy="AdminOnly">
+                                        <Authorized>
+                                            <li>
+                                                <a href="#">Admin</a>
+                                                <ul class="sub-menu">
+                                                    <li><a href="/admin/plate/add">Add new plate</a></li>
+                                                    <li><a href="/admin/plates/">All plates</a></li>
+                                                    <li><a href="/admin/orders">All orders</a></li>
+                                                    <li><a href="/admin/identity/users">All users</a></li>
+                                                </ul>
+                                            </li>
+                                        </Authorized>
+                                    </AuthorizeView>
+                                    <li>
+                                        <div class="header-icons">
+                                            <a class="shopping-cart" href="/client/cart/home"><i class="fas fa-shopping-cart"></i></a>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="header-icons">
+                                            <a class="mobile-hide search-bar-icon" href="#"><i class="fas fa-solid fa-user"></i></a>
+                                            <AuthorizeView>
+                                                <Authorized>
+                                                    <ul class="sub-menu">
+                                                        <li><a class="text" href="account/profile">Profile</a></li>
+                                                        <li><a class="text-danger" href="account/identity/logout">Logout</a></li>
+                                                    </ul>
+                                                </Authorized>
+                                                <NotAuthorized>
+                                                    <ul class="sub-menu">
+                                                        <li><a href="account/identity/login">Login</a></li>
+                                                        <li><a href="account/identity/register">Register</a></li>
+                                                    </ul>
+                                                </NotAuthorized>
+                                            </AuthorizeView>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </nav>
+                            <a class="mobile-show search-bar-icon" href="#"><i class="fa-regular fa-user"></i></a>
+                            <div class="mobile-menu"></div>
+                            <!-- menu end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @Body
 </div>
-<!-- end header -->
-</body>
+
+@code {
+    private bool ShowNavBar { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += HandleLocationChanged;
+        UpdateNavBarVisibility(Navigation.Uri);
+    }
+
+    private void HandleLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateNavBarVisibility(e.Location);
+    }
+
+    private void UpdateNavBarVisibility(string uri)
+    {
+        ShowNavBar = !uri.Contains("/account/profile");
+        StateHasChanged();
+    }
+}

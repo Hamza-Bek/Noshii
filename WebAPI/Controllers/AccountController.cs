@@ -81,5 +81,13 @@ namespace WebAPI.Controllers
             // Continue processing with userId
             return Ok($"User ID: {userId}");
         }
+
+
+        [HttpGet("get-user/{userId}")]
+        public async Task<ActionResult<GetUserDTO>> GetUser(string userId)
+        {
+            var data = await account.GetUser(userId);
+            return Ok(data);
+        }
     }
 }

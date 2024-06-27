@@ -31,6 +31,7 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
+        
         public async Task<OrderResponse> PlaceOrder( string userId, string cartId)
         {
             try
@@ -62,6 +63,7 @@ namespace Application.Services
             catch (Exception ex) { return new OrderResponse(flag: false, message: ex.Message); }
 
         }
+        
         public async Task<IEnumerable<Order>> GetOrder(string userId)
         {
             try
@@ -80,6 +82,7 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
+        
         public async Task<OrderResponse> ChangeOrderStatus(string orderId, string newStatusId)
         {
             var content = new StringContent(JsonSerializer.Serialize(new { newStatusId }), Encoding.UTF8, "application/json");
@@ -124,6 +127,7 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
+        
         public async Task<OrderResponse> ClearCartTotal(string userId)
         {
             var response = await _httpClient.DeleteAsync($"api/orders/clear-cart-total/{userId}");
@@ -155,6 +159,7 @@ namespace Application.Services
                 throw new Exception(ex.Message);
             }
         }
+        
         private static string CheckResponseStatus(HttpResponseMessage response)
         {
             if (!response.IsSuccessStatusCode)
@@ -177,6 +182,7 @@ namespace Application.Services
             var result = await response.Content.ReadFromJsonAsync<OrderResponse>();
             return result!;
         }
+        
         public async Task<bool> UpdateUserCartAsync(string userId)
         {
             var response = await _httpClient.PutAsync($"api/orders/update/user/cart/{userId}", null);

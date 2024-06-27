@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using NetcodeHub.Packages.Extensions.LocalStorage;
 using WebUI;
 
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -32,6 +33,7 @@ builder.Services.AddTransient<CustomHttpHandler>();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<PlateService>();
+
 builder.Services.AddScoped<IPlateService, PlateService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IClientService, ClientService>();
@@ -42,6 +44,11 @@ builder.Services.AddHttpClient("WebUIClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
 }).AddHttpMessageHandler<CustomHttpHandler>();
+
+builder.Services.AddHttpClient<IAccountService, AccountService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7173/");
+});
 
 
 builder.Services.AddHttpClient<IPlateService, PlateService>(client =>

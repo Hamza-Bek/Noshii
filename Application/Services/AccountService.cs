@@ -9,10 +9,12 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
+using Domain.Models.OrderEntities;
+using System.Net.Http;
 
 namespace Application.Services
 {
-    public class AccountService(HttpClientService httpClientService) : IAccountService
+    public class AccountService(HttpClientService httpClientService, HttpClient _httpClient) : IAccountService
     {
         public async Task<GeneralResponse> ChangeUserRoleAsync(ChangeUserRoleDTO model)
         {
@@ -146,6 +148,30 @@ namespace Application.Services
                 return $"sorry unkown error occured.{Environment.NewLine} Error Description : {Environment.NewLine} Status Code : {response.StatusCode}{Environment.NewLine} Reason Phrase : {response.ReasonPhrase}";
             else
                 return null;
+        }
+
+        public async Task<IEnumerable<GetUserDTO>> GetUser(string userId)
+        {
+            try
+            {
+                var privateClient = await httpClientService.GetPrivateClient();
+                var response = await privateClient.GetAsync($"api/account/get-user/{userId}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Log the status code or error for debugging purposes
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"HTTP Error: {response.StatusCode}, Details: {error}");
+                }
+
+                var result = await response.Content.ReadFromJsonAsync<IEnumerable<GetUserDTO>>();
+                return result ?? Enumerable.Empty<GetUserDTO>();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (if you have a logging mechanism)
+                throw new Exception($"Error fetching user details: {ex.Message}");
+            }
         }
     }
 }

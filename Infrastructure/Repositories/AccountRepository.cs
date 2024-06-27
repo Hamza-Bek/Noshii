@@ -307,5 +307,14 @@ namespace Infrastructure.Repositories
                 return new GeneralResponse(false, ex.Message);
             }
         }
+
+        public async Task<IEnumerable<GetUserDTO>> GetUser(string userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user is null) return null!;
+
+            var getUserDeatils = new GetUserDTO(user.Email, user.Name);
+            return new List<GetUserDTO> { getUserDeatils };                
+        }
     }
 }

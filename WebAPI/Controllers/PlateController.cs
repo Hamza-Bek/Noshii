@@ -96,7 +96,21 @@ namespace WebAPI.Controllers
 
             return Ok(categoriesDic);
         }
-    }
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<IActionResult> SearchPlates(string searchTerm)
+        {
+            var plates = await _plateRepository.SearchPlatesAsync(searchTerm);
+            return Ok(plates);
+        }
+
+		[HttpGet("get/plates-category/{category}")]
+		public async Task<IActionResult> GetPlatesByCategory(string category ="*")
+		{
+			var plates = await _plateRepository.GetPlatesByCategory(category);
+			return Ok(plates);
+		}
+	}
 }
 
 

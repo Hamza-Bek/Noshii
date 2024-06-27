@@ -1,0 +1,102 @@
+﻿@page "/admin/add-category"
+@inject IPlateService plateService
+@using Microsoft.AspNetCore.Http
+@using WebUI.Extensions
+
+@attribute [Authorize(Roles = Constants.Role.Admin)]
+
+<!-- breadcrumb-section -->
+<div class="breadcrumb-section breadcrumb-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2 text-center">
+                <div class="breadcrumb-text">
+                    <p>Add new</p>
+                    <h1>Category</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end breadcrumb section -->
+
+
+<div class="container">
+    <div class="wrapper">        
+        <form class="form-wrapper">
+
+            <EditForm Model="category" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <fieldset class="section is-active">
+                    
+                    <h3>Plate Details</h3>                    
+                    <InputText type="text" name="name" id="plateName" @bind-Value="category.CategoryTag" placeholder="Name" />
+                    <input class="submit button" type="submit" value="Add plate">
+                </fieldset>                           
+
+            </EditForm>
+
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .section.is-active {
+        position: relative; /* Ensure the fieldset is relatively positioned */
+    }
+
+        .section.is-active .next {
+            position: absolute;
+            bottom: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+        }
+
+    .button-container {
+        text-align: right; /* Aligns its child elements (buttons) to the right */
+        display: flex;
+        justify-content: space-between; /* Aligns items with space between them */
+        margin-top: 20px; /* Adjust margin as needed */
+    }
+
+    .button.back {
+        position: relative;
+        left: 0; /* Positions the "Back" button to the left */
+    }
+
+    .button.next {
+        position: relative;
+        right: 0; /* Positions the "Next" button to the right */
+    }
+
+</style>
+<script src="/js/AppPlate.js"></script>
+
+
+<script src="/js/AppPlate.js"></script>
+@code {
+
+    public Category category = new Category();
+
+    private async Task HandleValidSubmit()
+    {
+        if (string.IsNullOrEmpty(category.CategoryId))
+        {
+            category.CategoryId = Guid.NewGuid().ToString();
+        }
+
+        var result = await plateService.AddCategory(category);
+
+        if (result.flag)
+        {
+            await js.InvokeVoidAsync("alert", "Category were added");        
+            NavManager.NavigateTo("/admin/plate/add");
+        }
+
+        else
+        {
+            Console.WriteLine($"Failed to add plate: {result.message}");
+        }
+    }
+}

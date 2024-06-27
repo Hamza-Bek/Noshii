@@ -3,7 +3,9 @@ using Application.DTOs.Response;
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
+using Domain.Models.OrderEntities;
 using Infrastructure.Data;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -11,13 +13,11 @@ namespace Infrastructure.Repositories
 {
     public class PlateRepository : IPlateRepository
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly AppDbContext _context;        
         private readonly IFilesRepository _filesRepository;
-        public PlateRepository(AppDbContext context, IMapper mapper, IFilesRepository filesRepository)
+        public PlateRepository(AppDbContext context,  IFilesRepository filesRepository)
         {
             _context = context;
-            _mapper = mapper;
             _filesRepository = filesRepository;
         }
         public async Task<PlateResponse> AddPlateAsync(PlateDTO model)
@@ -108,5 +108,62 @@ namespace Infrastructure.Repositories
         private async Task SaveChangesAsync() => await _context.SaveChangesAsync();
 
         public async Task<IEnumerable<Category>> GetCategoriesAsync() => await _context.Categories.AsNoTracking().ToListAsync();
-    }
+
+        public async Task<IEnumerable<PlateDTO>> SearchPlatesAsync(string searchTerm)
+        {			
+			var query = _context.Plates.AsQueryable();
+
+			if (!string.IsNullOrWhiteSpace(searchTerm))
+			{
+				query = query.Where(p => p.PlateName.StartsWith(searchTerm));
+			}
+
+			var plates = await query
+				.Include(p => p.Images)
+				.AsNoTracking()
+				.ToListAsync();
+
+			// Project Plate entities to PlateDTO
+			var plateDTOs = plates.Select(p => new PlateDTO
+			{
+				Id = p.Id,
+				PlateName = p.PlateName,
+				PlatePrice = p.PlatePrice,
+				PlateBio = p.PlateBio,
+				CoverImageUrl = p.Images.First().Url,
+				CategoryTag = p.CategoryTag
+			}).ToList();
+
+			return plateDTOs;
+		}
+
+		public async Task<IEnumerable<PlateDTO>> GetPlatesByCategory(string category)
+		{
+			var query = _context.Plates.AsQueryable();
+
+			if (!string.IsNullOrWhiteSpace(category))
+			{
+				query = query.Where(p => p.CategoryTag == category);
+			}
+
+			var plates = await query
+				.Include(p => p.Images)
+				.AsNoTracking()
+				.ToListAsync();
+
+			// Project Plate entities to PlateDTO
+			var plateDTOs = plates.Select(p => new PlateDTO
+			{
+				Id = p.Id,
+				PlateName = p.PlateName,
+				PlatePrice = p.PlatePrice,
+				PlateBio = p.PlateBio,
+				CoverImageUrl = p.Images.FirstOrDefault()?.Url,
+				CategoryTag = p.CategoryTag
+			}).ToList();
+
+			return plateDTOs;
+
+		}
+	}
 }

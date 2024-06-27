@@ -15,6 +15,7 @@
 }
 else
 {
+
 	
 
 <!-- breadcrumb-section -->
@@ -24,35 +25,71 @@ else
 			<div class="col-lg-8 offset-lg-2 text-center">
 				<div class="breadcrumb-text">
 					<p>Fresh and Organic</p>
-					<h1>Shop</h1>
+					<h1>Shop</h1>						
 				</div>
 			</div>
+
 		</div>
+			
+				<div class="col-lg-8 offset-lg-2 text-center">
+					<div class="search-bar">
+						<input type="text" class="search-input"
+							   @bind="searchTerm" @oninput="SearchPlates"
+							   placeholder="Search plates...">
+						<button class="search-button"><i class="fas fa-search"></i></button>
+					</div>
+				</div>
+			
 	</div>
+
 </div>
 <!-- end breadcrumb section -->
 
 <!-- products -->
 <div class="product-section mt-150 mb-150">
 	<div class="container">
-		
-		<div class="row product-lists">
-			@foreach(var plate in plates)
-			{
-				<div class="col-lg-4 col-md-6 text-center strawberry">
-					<div class="single-product-item">
-						<div class="product-image">
-							<a href="single-product.html"><img src="@plate.CoverImageUrl" alt=""></a>
-						</div>
-						<h3>@plate.PlateName</h3>
-						<p class="product-price"> @plate.PlatePrice$ </p>
-						<button @onclick="() => AddPlateToCart(plate.Id)" class="card__add-to-cart">
-							Add to Cart
-						</button>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="product-filters">
+						<ul>
+							<li class="@("category-filter" + (selectedCategory == null ? " active" : ""))"
+								@onclick="() => FilterPlates(null)">
+								All
+							</li>
+							@foreach (var kvp in Categories)
+							{
+								<li class="@("category-filter" + (selectedCategory == kvp.Value ? " active" : ""))"
+									@onclick="() => FilterPlates(kvp.Value)" data-filter="@kvp.Value">@kvp.Value</li>
+							}
+						</ul>
 					</div>
 				</div>
-			}
-		
+			</div>
+		<div class="row product-lists">
+				@if (filteredPlates.Any())
+				{
+					@foreach (var plate in filteredPlates)
+					{
+						<div class="col-lg-4 col-md-6 text-center @plate.CategoryTag.ToLower()">
+							<div class="single-product-item">
+								<div class="product-image">
+									<a href="single-product.html"><img src="@plate.CoverImageUrl" alt=""></a>
+								</div>
+								<h3>@plate.PlateName</h3>
+								<p class="product-price"> @plate.PlatePrice$ </p>
+								<button @onclick="() => AddPlateToCart(plate.Id)" class="card__add-to-cart">
+									Add to Cart
+								</button>
+							</div>
+						</div>
+					}
+				}
+				else
+				{
+					<p>No plates found.</p>
+				}
+			
+			
 			
 		</div>
 
@@ -146,23 +183,68 @@ else
 	</div>
 <!-- end copyright -->
 
+<style>
+		.search-bar {
+			position: relative;
+			max-width: 300px;
+			margin: 0 auto;
+			
+		}
 
+		.search-input {
+			width: 100%;
+			padding: 9px;
+			font-size: 16px;			
+			border-radius: 4px;
+		}
+
+		.search-button {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background-color: #F28123;
+			color: white;
+			border: none;
+			padding: 10px 15px;
+			border-radius: 0 4px 4px 0;
+			cursor: pointer;
+			height: 100%;
+			transition: background-color 0.3s ease;
+		}
+
+			.search-button:hover {
+				height:100%;
+				background-color: #d66c15;
+			}
+
+		.category-filter {
+			cursor: pointer;
+			margin-right: 10px;
+			padding: 5px 10px;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+
+			.category-filter.active {
+				background-color: orange;
+				color: white;
+			}
+</style>
 }
 @code {
 	private string userId;
 	public IEnumerable<PlateDTO>? plates { get; set; }
+	private IEnumerable<PlateDTO> filteredPlates;
+	  private string selectedCategory; // Track the selected category
+	private string searchTerm;
+	Dictionary<string, string> Categories = new();
 	[CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
 
 	protected override async Task OnInitializedAsync()
 	{
-		try
-		{
-			plates = await plateService.GetAllPlates();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error fetching plates: {ex.Message}");
-		}
+		await LoadPlates();
+		await LoadCategories();
 	}
 
 	private async Task AddPlateToCart(string plateId)
@@ -187,28 +269,77 @@ else
 			}
 			else
 			{
-				await js.InvokeVoidAsync("alert", "Something went wrong");
-			}
-			// var getUserCart = await orderService.GetUserCart(userId);
-			// if (getUserCart.IsOrdered == true)
-			// {
-			// 	await js.InvokeVoidAsync("alert", "Please wait until your order is finished");
-			// }
-			// else
-			// {
-			// 	var response = await clientService.AddPlateToCart(plateId, userId);
-			// 	await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
-			// }
+				await js.InvokeVoidAsync("alert", "Something went wrong with the response");
+			}		
 		}
 		else
 		{
 			await js.InvokeVoidAsync("alert", "Something went wrong");
 		}
+	}
 
-		// Assuming userId is fetched from a user service or stored in the component
-		// Replace with actual user ID retrieval logic
+	private async Task LoadPlates()
+	{
+		try
+		{
+			plates = await plateService.GetAllPlates();
+			filteredPlates = plates; // Initialize filtered plates with all plates initially
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error fetching plates: {ex.Message}");
+		}
+	}
 
+	private async Task SearchPlates(ChangeEventArgs e)
+	{
+		searchTerm = e.Value.ToString();
 
+		try
+		{
+			if (!string.IsNullOrEmpty(searchTerm))
+			{
+				filteredPlates = await plateService.SearchPlatesAsync(searchTerm);
+			}
+			else
+			{
+				plates = await plateService.GetAllPlates();
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error searching plates: {ex.Message}");
+		}
+	}
 
+	private async Task LoadCategories()
+	{
+		try
+		{
+			Categories = await plateService.GetCategories();
+			Console.WriteLine("Categories fetched successfully.");
+			foreach (var category in Categories)
+			{
+				Console.WriteLine($"Key: {category.Key}, Value: {category.Value}");
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error fetching categories: {ex.Message}");
+		}
+	}
+
+	private void FilterPlates(string? categoryKey)
+	{
+		selectedCategory = categoryKey;
+
+		if (categoryKey == null)
+		{
+			filteredPlates = plates; // Show all plates if categoryKey is null (All selected)
+		}
+		else
+		{
+			filteredPlates = plates.Where(p => p.CategoryTag == categoryKey).ToList();
+		}
 	}
 }

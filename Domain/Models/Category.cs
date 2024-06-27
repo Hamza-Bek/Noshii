@@ -8,7 +8,7 @@ namespace Domain.Models
 {
 	public class Category
 	{
-        public required string CategoryId { get; set; }
-        public required string CategoryTag { get; set; }
+        public  string CategoryId { get; set; }
+        public  string CategoryTag { get; set; }
     }
 }

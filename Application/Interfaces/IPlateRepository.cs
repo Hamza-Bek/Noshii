@@ -11,7 +11,8 @@ namespace Application.Interfaces
         Task<Plate> GetPlateById(string id);
         Task<Plate> GetPlateByName(string plateName);
         Task<IEnumerable<Category>> GetCategoriesAsync();
-
+        Task<IEnumerable<PlateDTO>> SearchPlatesAsync(string searchTerm);
+        Task<IEnumerable<PlateDTO>> GetPlatesByCategory(string category);
         //..//
 
         Task<Plate> PlateExist(string id);
