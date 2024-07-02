@@ -11,7 +11,7 @@ namespace Domain.Models.Authentication
         public string? CartId { get; set; }
                 
         public Cart Cart { get; set; }
-        
+        public Location Location { get; set; }
         public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }

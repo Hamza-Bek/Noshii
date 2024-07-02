@@ -27,85 +27,115 @@ else
 	<!-- end breadcrumb section -->
 
 	<!-- cart -->
-	<div class="cart-section mt-150 mb-150">
-		<div class="container">
-			<div class="row justify-content-center">
-				<div class="col-lg-8 col-md-12">
-					<div class="cart-table-wrap">
-						<table class="cart-table">
-							<thead class="cart-table-head">
-								<tr class="table-head-row">
-									<th class="product-name">Order Number</th>
-									<th class="product-name">Client</th>
-									<th class="product-name">Date</th>
-									<th class="product-price">Total</th>
-									<th class="product-quantity">Status</th>
-									<th class="product-total">Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								@foreach (var order in orders)
-								{
-									<tr class="table-body-row">
-										<td class="product-name">@order.OrderNumber</td>
-										<td class="product-name">@order.OrderMaker.Email</td>
-										<td class="product-name">@order.OrderDate</td>
-										<td class="product-name">$@order.OrderTotal</td>
-										<td class="product-name">@order.OrderStatus</td>
-										<td>
-											<select @bind="@order.OrderStatus" class="checkboxes">
-												@foreach (var kvp in Statuses)
-												{
-													<option value="@kvp.Key">@kvp.Value</option>
+    <div class="cart-section mt-150 mb-150">
+        <div class="container">
+            <div class="row justify-content-center">
+                
+                    <div class="cart-table-wrap">
+                        <table class="cart-table">
+                           
+                                
+                                @foreach (var order in orders)
+                                {
+                                <thead class="cart-table-head">
+                                    <tr class="table-head-row">
+                                        <th class="product-name">Order Number</th>
+                                        <th class="product-name">Client</th>
+                                        <th class="product-name">Date</th>
+                                        <th class="product-price">Total</th>
+                                        <th class="product-quantity">Status</th>
+                                        <th class="product-total">Actions</th>
+                                        <th class="product-total">Details</th>
+                                        <th class="product-total">Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="table-body-row">
+                                        <td class="product-name">@order.OrderNumber</td>
+                                        <td class="product-name">@order.OrderMaker.Email</td>
+                                        <td class="product-name">@order.OrderDate</td>
+                                        <td class="product-name">$@order.OrderTotal</td>
+                                        <td class="product-name">@order.OrderStatus</td>
+                                        <td>
+                                            <select @bind="@order.OrderStatus" class="checkboxes">
+                                                @foreach (var kvp in Statuses)
+                                                {
+                                                    <option value="@kvp.Key">@kvp.Value</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-primary" @onclick="@(async () => await ChangeOrderStatusAsync(order.OrderId, order.OrderStatus))">Change Status</button>
+                                         
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-secondary mt-2" onclick="toggleDetails('order-details-@order.OrderId')">Show Order</button>                                        
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info mt-2" onclick="toggleLocation('order-location-@order.OrderId')">Show Location</button>
+                                        </td>
+                                    </tr>
 
-												}
-											</select>
-											<button class="btn btn-primary" @onclick="@(async () => await ChangeOrderStatusAsync(order.OrderId, order.OrderStatus))">Change Status</button>
-											<button class="btn btn-secondary mt-2" onclick="toggleDetails('order-details-@order.OrderId')">Show Order Details</button>
-										</td>										
-									</tr>
+                                    <tr id="order-details-@order.OrderId" class="order-details" style="display: none;">
+                                        <td colspan="6">
+                                            <div class="plate-items-section">
+                                                <h3>Order </h3>
+                                                <table class="plate-items-table table table-bordered mt-20">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Plate Name</th>
+                                                            <th>Quantity</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var item in order.GetOrderDetails)
+                                                        {
+                                                            <tr>
+                                                                <td>@item.PlateName</td>
+                                                                <td>@item.Quantity</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-									<tr id="order-details-@order.OrderId" class="order-details" style="display: none;">
-										<td colspan="3">
-											<div class="plate-items-section">
-												<h3>Order Details</h3>
-												<table class="plate-items-table table table-bordered mt-20">
-													<thead>
-														<tr>
-															<th>Plate Name</th>
-															<th>Quantity</th>
-														</tr>
-													</thead>
-													<tbody>
-														@foreach (var item in order.GetOrderDetails)
-														{
-															<tr>
-																<td>@item.PlateName</td>
-																<td>@item.Quantity</td>
-															</tr>
-														}
-													</tbody>
-												</table>
-											</div>
-										</td>
-									</tr>
-								}
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<!--<div class="coupon-section">
-					<h3>Apply Coupon</h3>
-					<div class="coupon-form-wrap">
-						<form action="index.html">
-							<p><input type="text" placeholder="Coupon"></p>
-							<p><input type="submit" value="Apply"></p>
-						</form>
-					</div>
-				</div>-->
-			</div>
-		</div>
-	</div>
+                                    <tr id="order-location-@order.OrderId" class="order-location" style="display: none;">
+                                        <td colspan="6">
+                                            <div class="location-section">
+                                                <table class="plate-items-table table table-bordered mt-20">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Phone</th>
+                                                            <th>Country</th>
+                                                            <th>Street</th>
+                                                            <th>Building</th>
+                                                            <th>Floor</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        
+                                                            <tr>
+                                                                <td>@order.Location?.PhoneNumber </td>
+                                                                <td>@order.Location?.Country</td>
+                                                                <td>@order.Location?.Street</td>
+                                                                <td>@order.Location?.Building</td>
+                                                                <td>@order.Location?.Floor</td>                                                            
+                                                            </tr>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                }
+                      
+                        </table>
+                    </div>                
+            </div>
+        </div>
+    </div>
+
 	<!-- end cart -->
 
 	<!-- footer -->
@@ -182,6 +212,11 @@ else
 	<!-- end copyright -->
 
 	<style>
+        table.cart-table {
+            border: 1px solid #f9f9f9; /* Border around the table */
+            width: 1500px;
+            ; /* Fixed width for the table */
+        }
 		.order-details {
 			background-color: #c0c0c0; /* Example background color for details */
 			text-align: center; /* Center the details box horizontally */
@@ -190,16 +225,26 @@ else
 		}
 	</style>
 
-	<script>
-		function toggleDetails(id) {
-			var element = document.getElementById(id);
-			if (element.style.display === "none") {
-				element.style.display = "table-row";
-			} else {
-				element.style.display = "none";
-			}
-		}
-	</script>
+    <script>
+        function toggleDetails(id) {
+            var details = document.getElementById(id);
+            if (details.style.display === "none") {
+                details.style.display = "table-row";
+            } else {
+                details.style.display = "none";
+            }
+        }
+
+        function toggleLocation(id) {
+            var location = document.getElementById(id);
+            if (location.style.display === "none") {
+                location.style.display = "table-row";
+            } else {
+                location.style.display = "none";
+            }
+        }
+
+    </script>
 
     }
 @code {

@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240627172818_AddLocationTableToDb")]
+    partial class AddLocationTableToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,9 +254,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("OrderId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("LocationId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -273,8 +273,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrderId");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("OrderMakerId");
 
@@ -523,15 +521,9 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Models.OrderEntities.Order", b =>
                 {
-                    b.HasOne("Domain.Models.OrderEntities.Location", "Location")
-                        .WithMany("Orders")
-                        .HasForeignKey("LocationId");
-
                     b.HasOne("Domain.Models.Authentication.ApplicationUser", "OrderMaker")
                         .WithMany("Orders")
                         .HasForeignKey("OrderMakerId");
-
-                    b.Navigation("Location");
 
                     b.Navigation("OrderMaker");
                 });
@@ -612,11 +604,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");
-                });
-
-            modelBuilder.Entity("Domain.Models.OrderEntities.Location", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("Domain.Models.OrderEntities.Order", b =>

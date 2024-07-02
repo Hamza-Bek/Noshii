@@ -38,6 +38,7 @@ namespace Infrastructure.Repositories
 			return await context.Orders
 								.Include(o => o.OrderMaker)
                                 .Include(g => g.GetOrderDetails)
+                                .Include(l => l.Location)
 								.ToListAsync();
 		}
 
@@ -52,7 +53,9 @@ namespace Infrastructure.Repositories
 
             var getUserOrders = await context.Orders
                     .Where(o => o.UserId == getUser.Id)
-                    .Include(o => o.OrderMaker) // Eager load OrderMaker                    
+                    .Include(o => o.OrderMaker)                    
+                    .Include(o => o.GetOrderDetails)
+                     .Include(o => o.Location)
                     .ToListAsync();
 
             if (getUserOrders == null || !getUserOrders.Any())
@@ -71,8 +74,10 @@ namespace Infrastructure.Repositories
         {
             var map = mapper.Map<Order>(order);
 
-            var getUser = await context.Users.FindAsync(userId);
-            if(getUser == null)
+            var getUser = await context.Users
+            .Include(u => u.Location) // Include the Location collection
+            .FirstOrDefaultAsync(u => u.Id == userId);
+            if (getUser == null)
                 return new OrderResponse(flag: false, message: "user not found");
 
             var getUserCart = await context.Carts.Include(p => p.CartItems).FirstOrDefaultAsync(c => c.UserId == userId);
@@ -87,7 +92,13 @@ namespace Infrastructure.Repositories
             if (getStatus.Status != order.OrderStatus)
                 return new OrderResponse(flag: false, message: $"Mismatched OrderStatus: {order.OrderStatus}");
 
+            var getUserLocation = await context.Locations.FirstOrDefaultAsync(l => l.ApplicationUserId == userId);
+            if (getUserLocation == null)
+                return new OrderResponse(flag: false, message: $"Location not found");
+
             decimal orderTotal = (decimal)getUserCart.CartTotal;
+
+                
 
             var o = new Order()
             {
@@ -98,6 +109,8 @@ namespace Infrastructure.Repositories
                 OrderTotal = orderTotal,
                 OrderStatus = order.OrderStatus,
                 OrderMaker = getUser,
+                LocationId = getUserLocation.LocationId,
+                Location = getUserLocation,
 				GetOrderDetails = getUserCart.CartItems.Select(cartitem => new OrderDetails
 				{
                     OrderDetailId = Guid.NewGuid().ToString(),
@@ -105,9 +118,9 @@ namespace Infrastructure.Repositories
 					Quantity = cartitem.Quantity
 				}).ToList()
 			};
+            context.Entry(getUserLocation).State = EntityState.Unchanged;
+            // getUserCart.IsOrdered = true;
 
-           // getUserCart.IsOrdered = true;
-            
             context.Orders.Add(o);
             // Remove cart items from the database
             context.CartItems.RemoveRange(getUserCart.CartItems);

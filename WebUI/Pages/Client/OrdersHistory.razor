@@ -1,11 +1,11 @@
-﻿@page "/client/order"
+﻿@page "/client/order/history"
 @using System.Security.Claims
 @using Domain.Models.OrderEntities
 @inject IOrderService orderService
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@if(isLoading)
+@if (isLoading)
 {
 	<!--PreLoader-->
 	<div class="loader">
@@ -24,7 +24,7 @@ else
 				<div class="col-lg-8 offset-lg-2 text-center">
 					<div class="breadcrumb-text">
 						<p>Wait and Take</p>
-						<h1>Orders</h1>
+						<h1>Orders History</h1>
 					</div>
 				</div>
 			</div>
@@ -47,7 +47,7 @@ else
 								</tr>
 							</thead>
 							<tbody>
-								@foreach (var order in orders.Where(o => o.OrderStatus == "Pending"))
+								@foreach (var order in orders.Where(o => o.OrderStatus != "Pending"))
 								{
 									<tr class="table-body-row">
 										<td class="product-name">#@order.OrderNumber</td>
@@ -62,8 +62,7 @@ else
 							</tbody>
 						</table>
 					</div>
-					<h3 style="padding-top:10px;">Didn't find your order? Check <a href="/client/order/history">History</a></h3>
-				</div>				
+				</div>
 				<!--<div class="coupon-section">
 					<h3>Apply Coupon</h3>
 					<div class="coupon-form-wrap">
@@ -152,35 +151,35 @@ else
 
 
 @code {
-    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
-    private string userId;
-    private IEnumerable<Order> orders;
-    private bool isLoading = true;
+	[CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+	private string userId;
+	private IEnumerable<Order> orders;
+	private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var authState = await AuthStateTask;
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			var authState = await AuthStateTask;
 
-            foreach (var claim in authState.User.Claims)
-            {
-                Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
-            }
+			foreach (var claim in authState.User.Claims)
+			{
+				Console.WriteLine($"Claim Type: {claim.Type} | Claim Value: {claim.Value}");
+			}
 
-            var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
-            var userCartIdClaim = authState.User.FindFirst(c => c.Type == "CartId");
-            if (userIdClaim != null)
-            {
-                userId = userIdClaim.Value;
-            }            			
-            orders = await orderService.GetOrder(userId);
-            isLoading = false;
-        }
-        catch (Exception ex)
-        {
-            // Handle exceptions (e.g., show error message)
-            Console.WriteLine($"Error fetching orders: {ex.Message}");
-        }
-    }
+			var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+			var userCartIdClaim = authState.User.FindFirst(c => c.Type == "CartId");
+			if (userIdClaim != null)
+			{
+				userId = userIdClaim.Value;
+			}
+			orders = await orderService.GetOrder(userId);
+			isLoading = false;
+		}
+		catch (Exception ex)
+		{
+			// Handle exceptions (e.g., show error message)
+			Console.WriteLine($"Error fetching orders: {ex.Message}");
+		}
+	}
 }

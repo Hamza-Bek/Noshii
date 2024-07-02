@@ -9,9 +9,11 @@ namespace Application.DTOs.Request.Order
     public class OrderDTO
     {
         public string OrderId { get; set; }
+        public string OrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal OrderTotal { get; set; }
         public string? OrderStatus { get; set; }
         public bool? IsOrdered { get; set; }
+        public string? LocationId { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace Infrastructure.Data
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -29,10 +30,16 @@ namespace Infrastructure.Data
             base.OnModelCreating(builder);
 
             builder.Entity<ApplicationUser>()
-            .HasOne(a => a.Cart)
-            .WithOne(c => c.CartOwner)
+            .HasOne(a => a.Cart)            
+            .WithOne(c => c.CartOwner)           
             .HasForeignKey<Cart>(c => c.UserId)
           .OnDelete(DeleteBehavior.NoAction);
+
+              builder.Entity<Location>()
+            .HasOne(l => l.LocationUser)
+            .WithOne()
+            .HasForeignKey<Location>(l => l.ApplicationUserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
 			builder.Entity<Order>()
 				.HasMany(o => o.GetOrderDetails)
@@ -40,7 +47,13 @@ namespace Infrastructure.Data
 				.HasForeignKey(od => od.OrderId)
 				  .OnDelete(DeleteBehavior.Cascade);
 
-			builder.Entity<OrderDetails>()
+
+            builder.Entity<Order>()
+        .HasOne(o => o.Location)
+        .WithMany(l => l.Orders)
+        .HasForeignKey(o => o.LocationId);
+
+            builder.Entity<OrderDetails>()
 		 .HasKey(od => od.OrderDetailId);
 
 			builder.Entity<OrderDetails>()

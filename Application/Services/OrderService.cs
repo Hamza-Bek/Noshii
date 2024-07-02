@@ -42,6 +42,8 @@ namespace Application.Services
                     OrderDate = DateTime.Now,
                     OrderStatus = "Pending",
                     OrderTotal = 0,
+                    OrderNumber = "0",
+                    LocationId = "0"
                 };
 
                 var data = await _httpClient.PostAsJsonAsync($"api/orders/order/place/{userId}/{cartId}", model);

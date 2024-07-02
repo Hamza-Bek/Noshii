@@ -87,6 +87,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
+builder.Services.AddScoped<ILocationReposiotry, LocationReposiotry>();
 #endregion
 var app = builder.Build();
 

@@ -1,4 +1,11 @@
-/*Template Name: Fruitkha - Responsive Bootstrap4 Shop TemplateTemplate URI: Description: Bootstrap template for fruits or any other kind of shopAuthor: Imran HossainAuthor URI: https://imransdesign.com/Version: 1.0*/
+/*
+Template Name: Fruitkha - Responsive Bootstrap4 Shop Template
+Template URI: 
+Description: Bootstrap template for fruits or any other kind of shop
+Author: Imran Hossain
+Author URI: https://imransdesign.com/
+Version: 1.0
+*/
 /* -----------------------------------------------------------------------------
 
 # Base - Genral & Typography
@@ -1352,7 +1359,31 @@ a.mobile-show.search-bar-icon:hover {
 
 # Hero Styles
 
------------------------------------------------------------------------------ */.hero-bg {    background-image: url('/imgs/hero2.jpeg');    background-size: cover;    background-position: center;    background-attachment: fixed;}.hero-text {    display: table;    width: 100%;    height: 100vh; /* Ensures the hero section takes the full viewport height */}.hero-text-tablecell {    display: table-cell;    vertical-align: middle; /* Vertically center the text */}.hero-area {    height: 100vh; /* Ensures the hero section takes the full viewport height */    position: relative;    z-index: 1;}
+----------------------------------------------------------------------------- */
+.hero-bg {
+    background-image: url('/imgs/hero2.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+}
+
+.hero-text {
+    display: table;
+    width: 100%;
+    height: 100vh; /* Ensures the hero section takes the full viewport height */
+}
+
+.hero-text-tablecell {
+    display: table-cell;
+    vertical-align: middle; /* Vertically center the text */
+}
+
+.hero-area {
+    height: 100vh; /* Ensures the hero section takes the full viewport height */
+    position: relative;
+    z-index: 1;
+}
 
 html, body {
   height: 100%;
@@ -2344,7 +2375,11 @@ ul.social-link-team li a {
 
 # Shop Page Styles
 
------------------------------------------------------------------------------ */.product-filters {    margin-bottom: 20px;    margin-top: -100px;}
+----------------------------------------------------------------------------- */
+.product-filters {
+    margin-bottom: 20px;
+    margin-top: -100px;
+}
 
 .product-filters ul {
   margin: 0;
@@ -2404,7 +2439,30 @@ p.product-price span {
   opacity: 0.8;
   font-size: 15px;
   font-weight: 400;
-}.card__add-to-cart {    background-color: #f0f0f0; /* light background color */    color: #333; /* light text color */    border: 1px solid #ccc; /* light border color */    border-radius: 18px; /* rounded corners */    padding: 10px 20px; /* padding for better appearance */    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* smooth transition */    cursor: pointer; /* cursor style */}    .card__add-to-cart:hover {        background-color: #F28123; /* new background color on hover */        color: #fff; /* new text color on hover */        border-color: #F28123; /* new border color on hover */        transform: scale(1.05);    }
+}
+
+
+
+
+
+.card__add-to-cart {
+    background-color: #f0f0f0; /* light background color */
+    color: #333; /* light text color */
+    border: 1px solid #ccc; /* light border color */
+    border-radius: 18px; /* rounded corners */
+    padding: 10px 20px; /* padding for better appearance */
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* smooth transition */
+    cursor: pointer; /* cursor style */
+}
+
+
+
+    .card__add-to-cart:hover {
+        background-color: #F28123; /* new background color on hover */
+        color: #fff; /* new text color on hover */
+        border-color: #F28123; /* new border color on hover */
+        transform: scale(1.05);
+    }
 
 
 a.cart-btn {
@@ -2490,9 +2548,14 @@ ul.product-share li a {
   margin-left: 30px;
 }
 
+
+
+
+
 table.cart-table {
-  border: 1px solid #f9f9f9;
-  width: 100%;
+    border: 1px solid #f9f9f9; /* Border around the table */
+    width: 100%;; /* Fixed width for the table */
+    
 }
 
 thead {
@@ -2728,4 +2791,19 @@ table.order-details tbody td {
 }
 
 
-/* */.blazored-toast {    font-family: Arial, sans-serif;    /* Add your custom styles here */}.blazored-toast-success {    background-color: #4CAF50;    color: white;}.blazored-toast-error {    background-color: #f44336;    color: white;}
+/* */
+
+.blazored-toast {
+    font-family: Arial, sans-serif;
+    /* Add your custom styles here */
+}
+
+.blazored-toast-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.blazored-toast-error {
+    background-color: #f44336;
+    color: white;
+}

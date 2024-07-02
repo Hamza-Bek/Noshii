@@ -12,12 +12,14 @@ namespace Domain.Models.OrderEntities
         public string? UserId { get; set; }
         public DateTime OrderDate { get; set; }
         public decimal OrderTotal { get; set; }
-        public string? OrderStatus { get; set; }		
+        public string? OrderStatus { get; set; }
 
-		// RELATIONSHIPS
+        // RELATIONSHIPS                
+        public string? LocationId { get; set; }
+        public Location? Location { get; set; }
 
-		public ApplicationUser OrderMaker { get; set; }
-
+   
+        public ApplicationUser OrderMaker { get; set; }
 		public ICollection<OrderDetails> GetOrderDetails { get; set; } = new List<OrderDetails>();
 
 		// public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();

@@ -39,6 +39,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IFilesService, FilesService>();
+builder.Services.AddScoped<ILocationService , LocationService>();
 
 builder.Services.AddHttpClient("WebUIClient", client =>
 {
@@ -50,7 +51,6 @@ builder.Services.AddHttpClient<IAccountService, AccountService>(client =>
     client.BaseAddress = new Uri("https://localhost:7173/");
 });
 
-
 builder.Services.AddHttpClient<IPlateService, PlateService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
@@ -60,13 +60,20 @@ builder.Services.AddHttpClient<IClientService, ClientService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
 });
+
 builder.Services.AddHttpClient<IOrderService, OrderService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
 });
+
 builder.Services.AddHttpClient<IFilesService, FilesService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7173/");
+});
+
+builder.Services.AddHttpClient<ILocationService, LocationService>(client =>
+{
+	client.BaseAddress = new Uri("https://localhost:7173/");
 });
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

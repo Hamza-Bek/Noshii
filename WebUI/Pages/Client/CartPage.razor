@@ -4,6 +4,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @inject IClientService clienService
 @inject IOrderService orderService
+@inject ILocationService locationService
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>Home</PageTitle>
@@ -105,33 +106,7 @@
 	</div>
 </div>
 <!-- end cart -->
-<!-- logo carousel -->
-<div class="logo-carousel-section">
-	<div class="container">
-		<div class="row">
-			<div class="col-lg-12">
-				<div class="logo-carousel-inner">
-					<div class="single-logo-item">
-						<img src="assets/img/company-logos/1.png" alt="">
-					</div>
-					<div class="single-logo-item">
-						<img src="assets/img/company-logos/2.png" alt="">
-					</div>
-					<div class="single-logo-item">
-						<img src="assets/img/company-logos/3.png" alt="">
-					</div>
-					<div class="single-logo-item">
-						<img src="assets/img/company-logos/4.png" alt="">
-					</div>
-					<div class="single-logo-item">
-						<img src="assets/img/company-logos/5.png" alt="">
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- end logo carousel -->
+
 <!-- footer -->
 <div class="footer-area">
 	<div class="container">
@@ -209,6 +184,7 @@
 	[CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
 	private string userId;
 	private string cartId;
+	private string userLocationId;
 	private bool isLoading = true;
 
 
@@ -226,10 +202,10 @@
 		var userIdClaim = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
 		var userCartIdClaim = authState.User.FindFirst(c => c.Type == "CartId");
 		if (userIdClaim != null)
-		{
+		{			
 			userId = userIdClaim.Value;
 			cartId = userCartIdClaim.Value;
-			plates = await clienService.GetCartItems(userId);
+			plates = await clienService.GetCartItems(userId);		
 
 		}
 
@@ -264,6 +240,13 @@
 
 		try
 		{
+			var location = await locationService.GetLocation(userId);
+			if (location == null || !location.Any())
+			{
+				NavManager.NavigateTo("/account/profile", true);
+				return;
+			}
+
 			if (plates == null || !plates.Any())
 			{
 				await js.InvokeVoidAsync("alert", "No plates in the cart!");
@@ -274,7 +257,7 @@
 			{
 				var response = await orderService.PlaceOrder(userId, cartId);
 				if (response.flag)
-				{
+				{					
 					// Handle success (e.g., display a success message, redirect to another page, etc.)
 					var clearCart = await orderService.ClearCartItems(userId);
 					if (clearCart.flag)
