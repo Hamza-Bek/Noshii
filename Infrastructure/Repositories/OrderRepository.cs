@@ -3,7 +3,6 @@ using Application.DTOs.Response;
 using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
-using Domain.Models.EmailEntities;
 using Domain.Models.OrderEntities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,7 @@ using System.Text;
 
 namespace Infrastructure.Repositories
 {
-    public class OrderRepository(AppDbContext context , IMapper mapper , IEmailSenderRepository _emailSenderRepository) : IOrderRepository
+    public class OrderRepository(AppDbContext context , IMapper mapper) : IOrderRepository
     {
         public async Task<OrderResponse> ChangeOrderStatusAsync(string orderId,string newStatusId)
         {
@@ -128,20 +127,8 @@ namespace Infrastructure.Repositories
 
             // Clear cart items from the cart object
             getUserCart.CartItems.Clear();
-            await SaveChangesAsync();
-
-            if(getUserLocation != null)
-            {
-				var mailRequest = new MailRequest
-				{
-					ToEmail = getUser.Email,
-					Subject = "Order Confirmation"
-				};
-				await _emailSenderRepository.SendEmailAsync(mailRequest, userId);
-			}
-	
-
-			return new OrderResponse(flag: true, message: "Order placed");
+            await SaveChangesAsync();            
+            return new OrderResponse(flag: true, message: "Order placed");
         }
 
         public async Task<IEnumerable<OrderStatus>> GetStatusesAsync() => await context.OrderStatuses.AsNoTracking().ToListAsync();
