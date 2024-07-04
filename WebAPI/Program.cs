@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using Domain.Models.Authentication;
+using Domain.Models.EmailEntities;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +25,8 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 #region Connection String
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -88,6 +91,7 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IFilesRepository, FilesRepository>();
 builder.Services.AddScoped<ILocationReposiotry, LocationReposiotry>();
+builder.Services.AddTransient<IEmailSenderRepository, EmailSenderRepository>();
 #endregion
 var app = builder.Build();
 
@@ -107,7 +111,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
 app.UseCors("WebUI");
+
 
 app.UseHttpsRedirection();
 
