@@ -80,9 +80,26 @@ namespace Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<LocationResponse> UpdateLocation(LocationDTO model)
+        public async Task<LocationResponse> UpdateLocation(LocationDTO model)
         {
-            throw new NotImplementedException();
+            if (model == null)
+                return new LocationResponse(Flag: false, Message: "Null values are not accepted");
+
+            var location = await _context.Locations.FindAsync(model.LocationId);
+            if (location == null)
+                return new LocationResponse(Flag: false, Message: "Location not found");
+
+            location.PhoneNumber = model.PhoneNumber;
+            location.Country = model.Country;
+            location.Street = model.Street;
+            location.Building = model.Building;
+            location.Floor = model.Floor;
+            location.ApplicationUserId = model.ApplicationUserId;
+
+            _context.Locations.Update(location);
+            await SaveChangesAsync();
+
+            return new LocationResponse(Flag: true, Message: "Location updated successfully!");
         }
 
         private async Task SaveChangesAsync() => await _context.SaveChangesAsync();

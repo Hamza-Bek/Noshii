@@ -23,6 +23,33 @@ namespace WebAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPut("update-location")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> UpdateLocation([FromBody] LocationDTO model)
+        {
+            if (model == null || string.IsNullOrEmpty(model.LocationId) || string.IsNullOrEmpty(model.ApplicationUserId))
+            {
+                return BadRequest("Invalid location data.");
+            }
+
+            var existingLocation = await _context.Locations.FindAsync(model.LocationId);
+            if (existingLocation == null)
+            {
+                return NotFound("Location not found.");
+            }
+
+            existingLocation.PhoneNumber = model.PhoneNumber;
+            existingLocation.Country = model.Country;
+            existingLocation.Street = model.Street;
+            existingLocation.Building = model.Building;
+            existingLocation.Floor = model.Floor;
+
+            _context.Locations.Update(existingLocation);
+            await _context.SaveChangesAsync();
+
+            return Ok(new LocationResponse(true, "Location updated successfully."));
+        }
 
         [HttpGet("location/{userId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Location>))]

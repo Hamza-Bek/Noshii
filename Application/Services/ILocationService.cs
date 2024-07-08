@@ -13,5 +13,6 @@ namespace Application.Services
 	{
 		Task <IEnumerable<LocationDTO>> GetLocation(string userId);
 		Task<LocationResponse> AddLocation(LocationDTO model);
+		Task<LocationResponse> UpdateLocation(LocationDTO model);
 	}
 }

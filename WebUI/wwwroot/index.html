@@ -10,7 +10,11 @@
     <title>WebUI</title>
     <base href="/" />
 
+    <!-- Add these lines in the <head> section -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
+    <!-- Add these lines before the closing </body> tag -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <link rel="stylesheet" href="/css/all.min.css">
     <!-- bootstrap -->
@@ -45,8 +49,8 @@
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="css/FormPageStyle.css">
     <!--===============================================================================================-->
-    <link rel="stylesheet"  type="text/css" href="css/ProfileStyle.css" />
-    
+    <link rel="stylesheet" type="text/css" href="css/ProfileStyle.css" />
+
 </head>
 
 <body>
@@ -84,9 +88,21 @@
     <!-- main js -->
     <script src="/js/main.js"></script>
 
- 
 
 
+    <script>
+        function showToast(message, type) {
+            Toastify({
+                text: message,
+                duration: 3000, // Duration in milliseconds
+                gravity: "top", // top or bottom
+                position: "right", // left, center or right
+                backgroundColor: type === "success" ? "green" : "red",
+                close: true,
+                stopOnFocus: true
+            }).showToast();
+        }
+    </script>
 </body>
 
 </html>

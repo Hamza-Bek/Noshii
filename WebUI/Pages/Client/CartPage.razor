@@ -223,8 +223,11 @@
 			var response = await clienService.RemovePlateFromCart(plateId, userId);
 			if (response.flag)
 			{
+				await js.InvokeVoidAsync("showToast", "Plate removed", "error");
 				plates = plates.Where(p => p.PlateId != plateId).ToList();
-				NavManager.NavigateTo(NavManager.Uri, forceLoad: true);
+				
+				plates = await clienService.GetCartItems(userId);
+				
 			}
 
 		}

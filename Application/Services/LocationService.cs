@@ -63,6 +63,36 @@ namespace Application.Services
 				return null!;
 		}
 
-     
+        public async Task<LocationResponse> UpdateLocation(LocationDTO model)
+        {
+            try
+            {
+                var data = await httpClient.PutAsJsonAsync("api/location/update-location", model);
+                if (!data.IsSuccessStatusCode)
+                {
+                    string responseContent = await data.Content.ReadAsStringAsync();
+                    return new LocationResponse(Flag: false, Message: $"Failed to update location. StatusCode: {data.StatusCode}, Response: {responseContent}");
+                }
+
+                var response = await data.Content.ReadFromJsonAsync<LocationResponse>();
+                if (response == null)
+                {
+                    return new LocationResponse(Flag: false, Message: "Invalid response received from server.");
+                }
+
+                if (response.Flag)
+                {
+                    return new LocationResponse(Flag: true, Message: "Location updated successfully.");
+                }
+                else
+                {
+                    return new LocationResponse(Flag: false, Message: "Something went wrong while trying to update the location.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new LocationResponse(Flag: false, Message: $"Exception: {ex.Message}");
+            }
+        }
     }
 }

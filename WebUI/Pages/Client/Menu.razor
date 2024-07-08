@@ -5,13 +5,19 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 <PageTitle>Home</PageTitle>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 @inject HttpClient Http
 @inject IClientService clientService
 @inject IOrderService orderService
-
 @if (plates == null)
 {
-	<p><em>Loading...</em></p>
+	<!--PreLoader-->
+	<div class="loader">
+		<div class="loader-inner">
+			<div class="circle"></div>
+		</div>
+	</div>
+	<!--PreLoader Ends-->
 }
 else
 {
@@ -230,6 +236,8 @@ else
 				color: white;
 			}
 </style>
+
+
 }
 @code {
 	private string userId;
@@ -265,16 +273,16 @@ else
 			var response = await clientService.AddPlateToCart(plateId, userId);
 			if(response.flag)
 			{
-				await js.InvokeVoidAsync("alert", "Plate added to the Cart :)");
+				await js.InvokeVoidAsync("showToast", "Added Successfully", "success");
 			}
 			else
 			{
-				await js.InvokeVoidAsync("alert", "Something went wrong with the response");
+				await js.InvokeVoidAsync("showToast", "Something went wrong with the response", "error");
 			}		
 		}
 		else
 		{
-			await js.InvokeVoidAsync("alert", "Something went wrong");
+			await js.InvokeVoidAsync("showToast", "something went wrong", "error");
 		}
 	}
 

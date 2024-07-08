@@ -7,7 +7,13 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @if (isLoading)
 {
-    <p>Loading...</p>
+    <!--PreLoader-->
+    <div class="loader">
+        <div class="loader-inner">
+            <div class="circle"></div>
+        </div>
+    </div>
+    <!--PreLoader Ends-->
 }
 else
 {    
@@ -78,54 +84,39 @@ else
           Delivery Details
             </h1>
             <p>All available input types are included</p>
-            <EditForm Model="location" OnValidSubmit="HandleValidSubmit" >
+                <EditForm Model="location" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
                     <div class="nice-form-group">
                         <label>Phone</label>
-                        <InputText type="tel" @bind-Value="location.PhoneNumber" placeholder="phone number" />
+                        <InputText type="tel" @bind-Value="location.PhoneNumber" placeholder="Phone number" />
                     </div>
-                
-            <div class="nice-form-group">
-                <label>Country</label>
-                <InputText type="text" @bind-Value="location.Country" placeholder="Country"/>
-            </div>
-          
-          <div class="nice-form-group">
-                <label>Street</label>
-                <InputText type="text" @bind-Value="location.Street" placeholder="street number"/>
-            </div>
-            <!--
-/            <div class="nice-form-group">
-                <label>Location</label>
-                <InputText type="url" placeholder="(optional)" value="" />
-            </div>
-            -->
 
-            <div class="nice-form-group">
-                <label>Building</label>
-                <InputText type="text" placeholder="building number" @bind-Value="location.Building"/>
-            </div>
+                    <div class="nice-form-group">
+                        <label>Country</label>
+                        <InputText type="text" @bind-Value="location.Country" placeholder="Country" />
+                    </div>
 
-            <div class="nice-form-group">
-                <label>Floor</label>
-                <InputText type="text" placeholder="Floor number" @bind-Value="location.Floor" />
-            </div>
-             
-            <details>
-                        <summary>
-                            <button type="submit" class="toggle-code">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-code">
-                                    <polyline points="16 18 22 12 16 6" />
-                                    <polyline points="8 6 2 12 8 18" />
-                                </svg>
-                                Add delivery details
-                            </button>
-                        </summary>
-                <script src="https://gist.github.com/nielsVoogt/e25c9c8f2b8456bbd1239b775d21333f.js"></script>
-            </details>
-               </EditForm>
+                    <div class="nice-form-group">
+                        <label>Street</label>
+                        <InputText type="text" @bind-Value="location.Street" placeholder="Street number" />
+                    </div>
+
+                    <div class="nice-form-group">
+                        <label>Building</label>
+                        <InputText type="text" @bind-Value="location.Building" placeholder="Building number" />
+                    </div>
+
+                    <div class="nice-form-group">
+                        <label>Floor</label>
+                        <InputText type="text" @bind-Value="location.Floor" placeholder="Floor number" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        @(hasLocation ? "Update Location" : "Add Location")
+                    </button>
+                </EditForm>
         </section>
             <section>
                 <div class="href-target" id="structure"></div>
@@ -188,20 +179,47 @@ body{
     private IEnumerable<GetUserDTO> user;
     public LocationDTO location = new LocationDTO();
     private bool isLoading = true;
+    private bool hasLocation = false;
 
     private async Task HandleValidSubmit()
     {
-        location.LocationId = Guid.NewGuid().ToString();
-        location.ApplicationUserId = userId;
-        var result = await LocationService.AddLocation(location);
-        if(result.Flag)
+        Console.WriteLine($"Location Details: Phone = {location.PhoneNumber}, Country = {location.Country}, Street = {location.Street}, Building = {location.Building}, Floor = {location.Floor}");
+        Console.WriteLine($"Has Location: {hasLocation}");
+
+        if (hasLocation)
         {
-            await js.InvokeVoidAsync("alert", $"New Location were added");
-            NavManager.NavigateTo("/client/cart/home");
+            location.ApplicationUserId = userId;  // Ensure ApplicationUserId is set
+
+            var result = await LocationService.UpdateLocation(location);
+            Console.WriteLine($"Update Result: Success = {result.Flag}, Message = {result.Message}");
+
+            if (result.Flag)
+            {
+                await js.InvokeVoidAsync("alert", "Location updated successfully");
+                NavManager.NavigateTo("/client/cart/home");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to update location: {result.Message}");
+            }
         }
         else
         {
-            Console.WriteLine($"Failed to add location");
+            location.LocationId = Guid.NewGuid().ToString();
+            location.ApplicationUserId = userId;  // Ensure ApplicationUserId is set
+
+            var result = await LocationService.AddLocation(location);
+            Console.WriteLine($"Add Result: Success = {result.Flag}, Message = {result.Message}");
+
+            if (result.Flag)
+            {
+                await js.InvokeVoidAsync("alert", "New location added successfully");
+                NavManager.NavigateTo("/client/cart/home");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to add location: {result.Message}");
+            }
         }
     }
 
@@ -224,6 +242,13 @@ body{
             }
 
             user = await accountService.GetUser(userId);
+            var userLocations = await LocationService.GetLocation(userId);
+            if (userLocations != null && userLocations.Any())
+            {
+                location = userLocations.First();
+                hasLocation = true;
+            }
+
             isLoading = false;
         }
         catch (Exception ex)
@@ -232,7 +257,4 @@ body{
             Console.WriteLine($"Error fetching orders: {ex.Message}");
         }
     }
-     
-
-
 }
